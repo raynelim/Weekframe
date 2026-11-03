@@ -1469,7 +1469,7 @@ const B={
    <div class="row"><button class="btn" data-act="docopy">${ic('copy')}Copy</button><span class="hint" id="copyhint"></span></div></div>
   <div class="fld"><label class="row" style="cursor:pointer"><input type="checkbox" id="f-done" ${b.done?'checked':''}> <span>Mark as skipped this week</span></label><p class="hint">Fades the block so you can see what moved without deleting it.</p></div>
   <div class="foot"><button class="btn" data-act="dup">${ic('copy')}Duplicate</button><button class="btn dan" data-act="delblock">${ic('trash')}Delete</button><span style="flex:1"></span><button class="btn pri" data-act="close">Done</button></div>`]},
- cats(){const ce=catEdit;const edRow=(c)=>`<div class="crow cat editing" style="${catVars(ce.col)}" data-sid="${c.id}">
+ cats(){const ce=catEdit;const edRow=(c)=>`<div class="crow cat editing" style="${catVars(ce.col)}"${c?` data-sid="${c.id}"`:''}>
    <div class="row"><span class="cdot"></span><input class="inp grow" id="ce-name" value="${esc(ce.name)}" placeholder="Category name, like Work" autocomplete="off" aria-label="Category name"><button class="cbtn ok" data-act="ceok" aria-label="Save category" title="Save (Enter)">${ic('check')}</button><button class="cbtn no" data-act="cecancel" aria-label="Cancel" title="Cancel (Esc)">${ic('x')}</button></div>
    <div class="pal">${PKEYS.map(k=>`<button class="pd cat ${ce.col===k?'on':''}" style="${catVars(k)}" data-act="cepick" data-k="${k}" aria-label="${k}"></button>`).join('')}</div><p class="err" id="ce-err" hidden></p></div>`;
   return ['Categories',`
