@@ -1205,6 +1205,25 @@ button.spsh:hover{background:var(--sunk)}
 .jfoot .btn.dan{padding:0 10px}
 .spcol{gap:12px!important}
 .spboard{gap:12px 16px!important}
+
+.jch:hover{background:transparent}
+.scard.jc:hover{border-color:var(--faint)}
+.scard.jc.open{box-shadow:0 1px 2px rgba(20,20,15,.04),0 8px 24px rgba(20,20,15,.07);border-color:var(--line)}
+.scard.jc.open .jch{border-bottom:1px solid var(--line2)}
+.jbody{padding-top:4px}
+.jlist .jx:first-child{border-top:0}
+.scard.editing{border-color:var(--faint)!important;box-shadow:0 0 0 1px var(--faint)!important}
+.spboard.focusing .scard.editing{box-shadow:0 0 0 1px var(--faint),0 18px 50px rgba(20,20,15,.14)!important}
+
+.jch .spt{font-size:17.5px!important;font-weight:600}
+.jbody{padding:14px 16px 14px 36px!important;gap:14px!important}
+.jx{align-items:baseline}
+.jx{padding:7px 0;font-size:15px;color:var(--ink)}
+.jlist .jx:first-child{padding-top:0}
+.jlist .jx:last-child{padding-bottom:0}
+.jx span:last-child{font-size:14px!important;color:var(--muted)}
+.jfoot .hint{font-size:14.5px;color:var(--muted)}
+.jbody>.hint{font-size:15px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -2097,16 +2116,16 @@ function groupRow(g,D){const gd=D.G[g],has=D.groups.includes(g),n=gd.exs.length;
   return has?`<button class="grw" data-act="trtab" data-t="${g}">${inner}${ic('chev')}</button>`:`<div class="grw off">${inner}<span></span></div>`}
 function overallBody(D){const H=S.hist;
   const catOfH=h=>{const c=catOfEx(h.exId);if(c)return c;const sp=getSp(h.splitId);return sp&&sp.cat||null};
-  const by={};SPCATS.forEach(c=>by[c]={n:0,sets:0,dates:new Set(),ex:{}});let tot=0;
+  const AC=activeCats(),by={};AC.forEach(c=>by[c]={n:0,sets:0,dates:new Set(),ex:{}});let tot=0;
   H.forEach(h=>{const c=catOfH(h);if(!c||!by[c])return;const o=by[c];o.n++;tot++;o.sets+=+h.sets||0;o.dates.add(h.date);o.ex[h.exId]=(o.ex[h.exId]||0)+1});
-  const slices=SPCATS.map(c=>{const o=by[c],top=Object.entries(o.ex).sort((a,b)=>b[1]-a[1]).slice(0,3);
-    return {label:c,value:o.n,val:o.n,col:GCOL[c],tip:o.n?`<b>${c}</b><div>${o.n} exercise${o.n===1?'':'s'} logged · ${pct(o.n/tot)}</div><div>${o.dates.size} day${o.dates.size===1?'':'s'} · ${o.sets} sets</div><div class="tt">Most done: ${top.map(([id,n])=>`${esc(exInfo(id).name)} (${n})`).join(', ')}</div>`:`<b>${c}</b><div>Nothing logged yet</div>`}});
+  const slices=AC.length?AC.map(c=>{const o=by[c],top=Object.entries(o.ex).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    return {label:c,value:o.n,val:o.n,col:GCOL[c],tip:o.n?`<b>${c}</b><div>${o.n} exercise${o.n===1?'':'s'} logged · ${pct(o.n/tot)}</div><div>${o.dates.size} day${o.dates.size===1?'':'s'} · ${o.sets} sets</div><div class="tt">Most done: ${top.map(([id,n])=>`${esc(exInfo(id).name)} (${n})`).join(', ')}</div>`:`<b>${c}</b><div>Nothing logged yet</div>`}}):[{label:'No splits yet',value:0,val:0,col:'slate',tip:''}];
   if(tot)slices.sort((a,b)=>b.value-a.value);
-  const weeks=wkDays().map(w=>{const cnt={};H.filter(h=>h.date===w).forEach(h=>{const c=catOfH(h);if(c)cnt[c]=(cnt[c]||0)+1});return {w,parts:SPCATS.filter(c=>cnt[c]).map(c=>({v:cnt[c],col:GCOL[c],label:c}))}});
+  const weeks=wkDays().map(w=>{const cnt={};H.filter(h=>h.date===w).forEach(h=>{const c=catOfH(h);if(c)cnt[c]=(cnt[c]||0)+1});return {w,parts:AC.filter(c=>cnt[c]).map(c=>({v:cnt[c],col:GCOL[c],label:c}))}});
   const WG=Object.keys(TRACK),srt=WG.map(g=>[g,D.G[g].w]).sort((a,b)=>b[1]-a[1]),tw=srt.reduce((a,x)=>a+x[1],0)||1,topG=srt[0],lowG=srt[srt.length-1];
   const tiles=H.length?[[sessThisWeek(),'sessions this week'],[fmtW(sessKeys(28).size/4),'avg sessions a week'],[topG[1]?topG[0]:'None',`most trained group${topG[1]?' · '+pct(topG[1]/tw):''}`],[lowG[0],`least trained group · ${pct(lowG[1]/tw)}`]]:[[0,'sessions this week'],[0,'avg sessions a week'],['Not yet','most trained group'],['Not yet','least trained group']];
   const rows=[...activeCats(),...(D.groups.includes('Custom')?['Custom']:[])];
-  return vizCard(`<div class="lab">Training overview</div>${donut(slices,fmtN(tot),'exercises')}`,`${chartHead('Exercises per day, by muscle group')}${weekBars(weeks,'exercises')}`,tiles,H.length?'':'No sessions logged yet. Log a session from one of your splits and this fills in.',false)+
+  return vizCard(`<div class="lab">Training overview</div>${donut(slices,fmtN(tot),'exercises')}`,`${chartHead('Exercises per day, by muscle group')}${weekBars(weeks,'exercises')}`,tiles,H.length?'':(AC.length?'No sessions logged yet. Log a session from one of your splits and this fills in.':'Add a split to start your training overview.'),false)+
    `<div class="card trlist"><div class="lab">Muscle groups</div>${rows.length?rows.map(g=>groupRow(g,D)).join(''):'<p class="hint" style="padding:8px 0;margin:0">Muscle groups show up here once you add a split for them.</p>'}</div>`}
 function cardioBody(D){const gd=D.G.Cardio,E=S.hist.filter(x=>exInfo(x.exId).group==='Cardio'),cmp=gd.exs.some(id=>expEx.has(id));
   const bx={};E.forEach(x=>{const o=bx[x.exId]||(bx[x.exId]={min:0,kcal:0,d:0,dates:new Set()});o.min+=minutesOf(x);o.kcal+=kcalOf(x);o.d+=+x.d||0;o.dates.add(x.date)});
@@ -2205,7 +2224,7 @@ function splitCard(sp){
     if(!logDraft.rows.length)h+='<p class="hint">Add exercises to this split first.</p>';
     h+=`<div class="foot"><button class="btn" data-act="lgcancel">Cancel</button><span style="flex:1"></span><button class="btn pri" data-act="lgsave">${ic('check')}Save session</button></div></div>`;return h}
   const open=spOpen.has(sp.id),exl=sp.items.filter(i=>i.exId),when=cnt?dayLabel(last).toLowerCase():'not yet';
-  let h=`<div class="scard cat jc ${open?'open':''}" style="${catVars(sp.col)}" data-sid="${sp.id}"><button class="jch" data-act="sptog" data-id="${sp.id}" aria-expanded="${open}"><span class="grip" data-grip title="Drag to reorder" aria-hidden="true">${ic('grip')}</span><span class="cdot"></span><span class="spt">${nm}</span><span class="jmeta">${exl.length} ex${exl.length?' · '+when:''}</span>${ic('chev')}</button>`;
+  let h=`<div class="scard cat jc ${open?'open':''}" style="${catVars(sp.col)}" data-sid="${sp.id}"><button class="jch" data-act="sptog" data-id="${sp.id}" aria-expanded="${open}"><span class="grip" data-grip title="Drag to reorder" aria-hidden="true">${ic('grip')}</span><span class="cdot"></span><span class="spt">${nm}</span>${ic('chev')}</button>`;
   if(open)h+=`<div class="jbody">${exl.length?`<div class="jlist">${exl.map(i=>`<div class="jx"><span>${esc(exInfo(i.exId).name)}</span><span>${specOf(i)}</span></div>`).join('')}</div>`:'<p class="hint" style="margin:0">No exercises yet.</p>'}
    <div class="jfoot"><span class="hint">${cnt} session${cnt===1?'':'s'}${cnt?' · last '+when:''}</span><span class="sp"></span><button class="btn" data-act="spedit" data-id="${sp.id}">${ic('edit')}Edit</button><button class="btn dan" data-act="spdel" data-id="${sp.id}" aria-label="Delete ${nm}" title="Delete">${ic('trash')}</button><button class="btn pri" data-act="splog" data-id="${sp.id}">${ic('check')}Log session</button></div></div>`;
   h+='</div>';
