@@ -1184,6 +1184,27 @@ button.spsh:hover{background:var(--sunk)}
 .sppill .sw{width:10px;height:10px;border-radius:3px;background:var(--s)}
 .sppill .hint{font-size:12px;font-family:var(--mono)}
 .sppill:hover{border-color:var(--s);background:var(--f);color:var(--t)}
+
+.scard.jc{padding:0;gap:0!important;cursor:default}
+.jch{display:flex;align-items:center;gap:10px;width:100%;min-height:62px;padding:12px 16px 12px 10px;text-align:left;border-radius:14px}
+.jch:hover{background:var(--sunk)}
+.scard.jc.open .jch{border-radius:14px 14px 0 0}
+.jch .cdot{width:12px;height:12px;border-radius:4px;background:var(--s)}
+.jch .spt{flex:1;min-width:0;font-size:16.5px}
+.jmeta{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
+.jch>svg{width:16px;height:16px;color:var(--muted);transition:transform .2s;flex:none}
+.scard.jc.open .jch>svg{transform:rotate(180deg)}
+.scard.jc.open{box-shadow:0 0 0 1px var(--s)}
+.jbody{padding:2px 16px 14px 36px;display:flex;flex-direction:column;gap:12px;animation:fadeq .22s ease-out}
+.jlist{display:flex;flex-direction:column}
+.jx{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line2);font-size:14px}
+.jx span:last-child{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
+.jfoot{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.jfoot .sp{flex:1}
+.jfoot .btn{height:34px}
+.jfoot .btn.dan{padding:0 10px}
+.spcol{gap:12px!important}
+.spboard{gap:12px 16px!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -2028,8 +2049,9 @@ const tileHTML=t=>`<div class="sb"><div class="v">${t[0]}</div><div class="k">${
 function vizCard(left,right,tiles,hint,cmp){cmp=false;return `<div class="card trviz"><div class="mgviz"><div class="lovc">${left}</div><div class="lovc">${right}</div></div><div class="ostat4">${tiles.map(tileHTML).join('')}</div>${hint&&!cmp?`<p class="hint" style="margin:0">${hint}</p>`:''}</div>`}
 const SPCATS=['Chest','Back','Shoulders','Biceps','Triceps','Forearms','Legs','Core','Cardio'];
 const SPCOLS=[['Chest','Shoulders','Triceps','Legs','Core'],['Back','Biceps','Forearms','Cardio']];
+function activeCats(){const has=SPCATS.filter(c=>S.splits.some(sp=>sp.cat===c)),ord=S.set.tabOrder||[];return has.sort((a,b)=>{const ia=ord.indexOf(a),ib=ord.indexOf(b);return (ia<0?99+SPCATS.indexOf(a):ia)-(ib<0?99+SPCATS.indexOf(b):ib)})}
 function guessCat(sp){const c={};sp.items.forEach(i=>{if(!i.exId)return;const g=exInfo(i.exId).group;if(SPCATS.includes(g))c[g]=(c[g]||0)+1});const t=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];return t?t[0]:'Chest'}
-function migSplits(){let ch=false;S.splits.forEach(sp=>{if(!SPCATS.includes(sp.cat)){sp.cat=guessCat(sp);ch=true}});if(ch)save()}
+function migSplits(){let ch=false;S.splits.forEach((sp,i)=>{if(!SPCATS.includes(sp.cat)){sp.cat=guessCat(sp);ch=true}if(sp.side!==0&&sp.side!==1){sp.side=i%2;ch=true}});if(ch)save()}
 const catOfEx=id=>{const i=exInfo(id);if(i.group!=='Custom')return i.group;const c=S.exlib.find(x=>x.id===id);return c&&c.cat||null};
 function spGroups(cat){return S.splits.filter(sp=>sp.cat===cat)}
 function spStats(sp){let cnt=0,last=null;sessKeys(1e9).forEach(k=>{const [d,id]=k.split('|');if(id===sp.id){cnt++;if(!last||d>last)last=d}});return {cnt,last}}
@@ -2041,14 +2063,10 @@ function spDetail(sp){const ex=sp.items.filter(i=>i.exId),st=spStats(sp),sets=ex
    <div class="hv-r">${ic('check')}<span>${st.cnt?`Last done <b>${dayLabel(st.last).toLowerCase()}</b> · ${st.cnt} session${st.cnt===1?'':'s'}`:'Not logged yet'}</span></div>`}
 function splitsBody(){migSplits();const draft=spEdit&&spEdit.isNew?spEdit.draft:null;
   let h=`<div class="trsc"><div class="sec" style="margin:0 0 14px"><h2>Your splits</h2><button class="btn pri" data-act="spnewpick">${ic('plus')}New split</button></div>`;
-  const cats=SPCATS.filter(c=>spGroups(c).length||(draft&&draft.cat===c));
-  if(!cats.length)return h+`<div class="card empty"><b>Create your first split</b>Pick a muscle group, then add the exercises you do for it.<div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri" data-act="spnewpick">${ic('plus')}New split</button></div></div></div>`;
-  const coll=new Set(S.set.spColl||[]);
-  const sec=c=>{const gs=spGroups(c),busy=spEdit&&spEdit.draft.cat===c||(logOpen&&gs.some(x=>x.id===logOpen)),closed=coll.has(c)&&!busy,cards=gs.map(splitCard).join('')+(draft&&draft.cat===c?splitCard(draft):'');
-    return `<section class="spsec cat ${closed?'closed':''}" id="sps-${c}" data-sec="${c}" style="${catVars(GCOL[c])}"><button class="spsh" data-act="spsec" data-cat="${c}" aria-expanded="${!closed}" title="${closed?'Expand':'Collapse'} ${c}"><span class="cdot"></span><h3>${c}</h3><span class="hint">${gs.length} split${gs.length===1?'':'s'}</span><span class="sp"></span>${ic('chev')}</button>
-     ${closed?`<div class="sppills">${gs.map(sp=>`<button class="sppill cat" style="${catVars(sp.col)}" data-act="spfocus" data-id="${sp.id}" data-sid="${sp.id}"><span class="sw"></span>${esc(sp.name||'Untitled split')}<span class="hint">${sp.items.filter(i=>i.exId).length} ex</span></button>`).join('')}</div>`:`<div class="spgl" data-sort="splits">${cards}</div>`}</section>`};
-  const cols=[[],[]];cats.forEach((c,i)=>cols[i%2].push(c));
-  return h+`<div class="spboard ${spEdit?'focusing':''}">${cols.map(col=>`<div class="spcol">${col.map(sec).join('')}</div>`).join('')}</div></div>`}
+  const list=[...S.splits,...(draft?[draft]:[])];
+  if(!list.length)return h+`<div class="card empty"><b>Create your first split</b>Pick a muscle group, then add the exercises you do for it.<div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri" data-act="spnewpick">${ic('plus')}New split</button></div></div></div>`;
+  const cols=[[],[]];list.forEach(sp=>cols[sp.side===1?1:0].push(sp));
+  return h+`<div class="spboard ${spEdit?'focusing':''}">${cols.map((col,ci)=>`<div class="spcol" data-sort="splitcol" data-key="${ci}">${col.map((sp,ri)=>splitCard(sp).replace('style="',`style="order:${ri*2+ci};`)).join('')}</div>`).join('')}</div></div>`}
 /* board animation: cards keep their column, expanding pushes only what is below */
 function boardRects(){const m={};document.querySelectorAll('#p-ex .spboard [data-sid],#p-ex .spboard [data-sec]').forEach(el=>{m[(el.dataset.sid||'s:'+el.dataset.sec)]=el.getBoundingClientRect()});return m}
 function boardFlip(pre){if(!motionOK())return;const z=ZF();document.querySelectorAll('#p-ex .spboard [data-sid],#p-ex .spboard [data-sec]').forEach(el=>{const a=pre[el.dataset.sid||'s:'+el.dataset.sec];if(!a)return;const b=el.getBoundingClientRect(),dy=(a.top-b.top)/z;if(Math.abs(dy)>1)el.animate([{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'})})}
@@ -2065,11 +2083,11 @@ document.addEventListener('pointerdown',e=>{if(cpop&&!cpop.contains(e.target)&&!
 document.addEventListener('scroll',e=>{if(cpop&&!cpop.contains(e.target))closePops()},{capture:true,passive:true});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&cpop){e.stopImmediatePropagation();const f=cpop._for;closePops();f&&f.focus()}},true);
 let spHovT=null,spHovId=null;
-document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||(srt&&srt.on))return;const c=e.target.closest&&e.target.closest('#p-ex .spboard .scard.compact,#p-ex .spboard .sppill');
+document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||(srt&&srt.on))return;const c=e.target.closest&&e.target.closest('#p-ex .spboard .scard.jc:not(.open)');
   if(!c){if(spHovId){clearTimeout(spHovT);spHovId=null;hov.hidden=true}return}
-  if(e.target.closest('.grip')||(e.target.closest('button')&&!e.target.closest('.sppill'))){clearTimeout(spHovT);spHovId=null;hov.hidden=true;return}
+  if(e.target.closest('.grip')){clearTimeout(spHovT);spHovId=null;hov.hidden=true;return}
   if(c.dataset.sid===spHovId)return;clearTimeout(spHovT);spHovId=c.dataset.sid;hov.hidden=true;
-  spHovT=setTimeout(()=>{const sp=getSp(c.dataset.sid||c.dataset.id);if(!sp||!c.isConnected)return;hov.innerHTML=spDetail(sp);hov.hidden=false;const r=c.getBoundingClientRect(),z=ZF(),hw=hov.offsetWidth*z,hh=hov.offsetHeight*z;
+  spHovT=setTimeout(()=>{const sp=getSp(c.dataset.sid);if(!sp||!c.isConnected)return;hov.innerHTML=spDetail(sp);hov.hidden=false;const r=c.getBoundingClientRect(),z=ZF(),hw=hov.offsetWidth*z,hh=hov.offsetHeight*z;
     let x=r.right+10;if(x+hw>innerWidth-8)x=r.left-hw-10;if(x<8)x=Math.max(8,Math.min(innerWidth-hw-8,r.left));const y=Math.max(8,Math.min(r.top,innerHeight-hh-8));hov.style.left=x/z+'px';hov.style.top=y/z+'px'},300)});
 document.addEventListener('pointerdown',()=>{if(spHovId){clearTimeout(spHovT);spHovId=null;hov.hidden=true}},true);
 function groupRow(g,D){const gd=D.G[g],has=D.groups.includes(g),n=gd.exs.length;let val,unit,top;
@@ -2078,21 +2096,18 @@ function groupRow(g,D){const gd=D.G[g],has=D.groups.includes(g),n=gd.exs.length;
   const inner=`<span class="cdot cat" style="${catVars(GCOL[g])}"></span><span class="ln"><b>${g}</b><span class="hint">${n} exercise${n===1?'':'s'}</span></span><span class="lv"><b>${gd.dates.length}</b>days</span><span class="lv"><b>${val}</b>${unit}</span><span class="lv mh">${top?`<b style="font-size:17px">${esc(top)}</b>top`:''}</span><span class="lv mh lst">${gd.last?'Last trained '+lastLbl(gd.last):'Not trained yet'}</span>`;
   return has?`<button class="grw" data-act="trtab" data-t="${g}">${inner}${ic('chev')}</button>`:`<div class="grw off">${inner}<span></span></div>`}
 function overallBody(D){const H=S.hist;
-  if(!H.length){const sl=(S.splits.length?S.splits.map(sp=>({label:sp.name||'Untitled split',col:sp.col})):[{label:'No splits yet',col:'slate'}]).map(x=>({...x,value:0,val:0,tip:''}));
-    const rows0=[...Object.keys(MG),...(D.groups.includes('Custom')?['Custom']:[])];
-    return vizCard(`<div class="lab">Exercises done, by split</div>${donut(sl,'0','exercises')}`,`${chartHead('Exercises per day, by split')}${weekBars(wkDays().map(w=>({w,parts:[]})),'sessions')}`,[[0,'sessions this week'],[0,'avg sessions a week'],['Not yet','most trained group'],['Not yet','least trained group']],'No sessions logged yet. Log a session from one of your splits and this fills in.',false)+
-     `<div class="card trlist"><div class="lab">Muscle groups</div>${rows0.map(g=>groupRow(g,D)).join('')}</div>`}
-  const by={};H.forEach(h=>{const k=getSp(h.splitId)?h.splitId:'_';const o=by[k]||(by[k]={n:0,sets:0,dates:new Set(),ex:{}});o.n++;o.sets+=+h.sets||0;o.dates.add(h.date);o.ex[h.exId]=(o.ex[h.exId]||0)+1});
-  const tot=H.length,nm=k=>{const sp=getSp(k);return sp?(sp.name||'Untitled split'):'No split'};
-  const slices=Object.entries(by).map(([k,o])=>{const sp=getSp(k),top=Object.entries(o.ex).sort((a,b)=>b[1]-a[1]).slice(0,3);
-    return {label:nm(k),value:o.n,val:o.n,col:sp?sp.col:'slate',tip:`<b>${esc(nm(k))}</b><div>${o.n} exercise${o.n===1?'':'s'} logged · ${pct(o.n/tot)}</div><div>${o.dates.size} session${o.dates.size===1?'':'s'} · ${o.sets} sets</div><div class="tt">Most done: ${top.map(([id,c])=>`${esc(exInfo(id).name)} (${c})`).join(', ')}</div>`}}).sort((a,b)=>b.value-a.value);
-  const weeks=wkDays().map(w=>{const c={};H.filter(h=>h.date===w).forEach(h=>{const id=getSp(h.splitId)?h.splitId:'_';c[id]=(c[id]||0)+1});
-    return {w,parts:Object.entries(c).map(([id,v])=>({v,col:getSp(id)?getSp(id).col:'slate',label:nm(id)}))}});
+  const catOfH=h=>{const c=catOfEx(h.exId);if(c)return c;const sp=getSp(h.splitId);return sp&&sp.cat||null};
+  const by={};SPCATS.forEach(c=>by[c]={n:0,sets:0,dates:new Set(),ex:{}});let tot=0;
+  H.forEach(h=>{const c=catOfH(h);if(!c||!by[c])return;const o=by[c];o.n++;tot++;o.sets+=+h.sets||0;o.dates.add(h.date);o.ex[h.exId]=(o.ex[h.exId]||0)+1});
+  const slices=SPCATS.map(c=>{const o=by[c],top=Object.entries(o.ex).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    return {label:c,value:o.n,val:o.n,col:GCOL[c],tip:o.n?`<b>${c}</b><div>${o.n} exercise${o.n===1?'':'s'} logged · ${pct(o.n/tot)}</div><div>${o.dates.size} day${o.dates.size===1?'':'s'} · ${o.sets} sets</div><div class="tt">Most done: ${top.map(([id,n])=>`${esc(exInfo(id).name)} (${n})`).join(', ')}</div>`:`<b>${c}</b><div>Nothing logged yet</div>`}});
+  if(tot)slices.sort((a,b)=>b.value-a.value);
+  const weeks=wkDays().map(w=>{const cnt={};H.filter(h=>h.date===w).forEach(h=>{const c=catOfH(h);if(c)cnt[c]=(cnt[c]||0)+1});return {w,parts:SPCATS.filter(c=>cnt[c]).map(c=>({v:cnt[c],col:GCOL[c],label:c}))}});
   const WG=Object.keys(TRACK),srt=WG.map(g=>[g,D.G[g].w]).sort((a,b)=>b[1]-a[1]),tw=srt.reduce((a,x)=>a+x[1],0)||1,topG=srt[0],lowG=srt[srt.length-1];
-  const tiles=[[sessThisWeek(),'sessions this week'],[fmtW(sessKeys(28).size/4),'avg sessions a week'],[topG[1]?topG[0]:'None',`most trained group${topG[1]?' · '+pct(topG[1]/tw):''}`],[lowG[0],`least trained group · ${pct(lowG[1]/tw)}`]];
-  const rows=[...D.groups.filter(g=>g!=='Custom'),...Object.keys(MG).filter(g=>!D.groups.includes(g)),...(D.groups.includes('Custom')?['Custom']:[])];
-  return vizCard(`<div class="lab">Exercises done, by split</div>${donut(slices,fmtN(tot),'exercises')}`,`${chartHead('Exercises per day, by split')}${weekBars(weeks,'sessions')}`,tiles,'',false)+
-   `<div class="card trlist"><div class="lab">Muscle groups</div>${rows.map(g=>groupRow(g,D)).join('')}</div>`}
+  const tiles=H.length?[[sessThisWeek(),'sessions this week'],[fmtW(sessKeys(28).size/4),'avg sessions a week'],[topG[1]?topG[0]:'None',`most trained group${topG[1]?' · '+pct(topG[1]/tw):''}`],[lowG[0],`least trained group · ${pct(lowG[1]/tw)}`]]:[[0,'sessions this week'],[0,'avg sessions a week'],['Not yet','most trained group'],['Not yet','least trained group']];
+  const rows=[...activeCats(),...(D.groups.includes('Custom')?['Custom']:[])];
+  return vizCard(`<div class="lab">Training overview</div>${donut(slices,fmtN(tot),'exercises')}`,`${chartHead('Exercises per day, by muscle group')}${weekBars(weeks,'exercises')}`,tiles,H.length?'':'No sessions logged yet. Log a session from one of your splits and this fills in.',false)+
+   `<div class="card trlist"><div class="lab">Muscle groups</div>${rows.length?rows.map(g=>groupRow(g,D)).join(''):'<p class="hint" style="padding:8px 0;margin:0">Muscle groups show up here once you add a split for them.</p>'}</div>`}
 function cardioBody(D){const gd=D.G.Cardio,E=S.hist.filter(x=>exInfo(x.exId).group==='Cardio'),cmp=gd.exs.some(id=>expEx.has(id));
   const bx={};E.forEach(x=>{const o=bx[x.exId]||(bx[x.exId]={min:0,kcal:0,d:0,dates:new Set()});o.min+=minutesOf(x);o.kcal+=kcalOf(x);o.d+=+x.d||0;o.dates.add(x.date)});
   const totM=E.reduce((a,x)=>a+minutesOf(x),0),totK=E.reduce((a,x)=>a+kcalOf(x),0),days=gd.dates.length;
@@ -2154,12 +2169,12 @@ function renderEx(){
   const ids=[...new Set([...S.splits.flatMap(sp=>sp.items.map(i=>i.exId)),...S.hist.map(h=>h.exId)].filter(Boolean))];
   const allSess=sessKeys(1e9).size,wk=sessThisWeek(),D=groupData(ids);
   if(!trTab)trTab=S.set.trTab||(S.hist.length?'overall':'splits');
-  const TABS=[...D.groups,...Object.keys(MG).filter(g=>!D.groups.includes(g))];
+  migSplits();const TABS=[...activeCats(),...(D.groups.includes('Custom')?['Custom']:[])];
   if(trTab!=='splits'&&trTab!=='overall'&&!TABS.includes(trTab))trTab='overall';
   const tsl=$('trtabs')?$('trtabs').scrollLeft:0;
   const ls=P.querySelector('#tr-main .trlist,#tr-main .trsc'),st=ls&&lastTab===trTab?ls.scrollTop:0,preB=trTab==='splits'&&lastTab==='splits'?boardRects():null;closePops();
   let h=`<div class="trh"><div class="trt"><h1>Training</h1><span class="hint">${wk} session${wk===1?'':'s'} this week · ${allSess} all time</span><span class="sp"></span>${ids.length?`<div class="srch">${ic('search')}<input class="inp" type="search" id="lt-q" data-f="ltq" placeholder="Search exercises or muscles" value="${esc(ltq)}" autocomplete="off" aria-label="Search exercises"></div>`:''}</div>
-   <div class="tabwrap"><button class="tarr l" data-act="tscroll" data-d="-1" aria-label="Jump to first tabs" hidden>${ic('back')}</button><div class="trtabs" id="trtabs" role="tablist" aria-label="Training views"><button class="sg tb ${trTab==='splits'?'on':''}" role="tab" aria-selected="${trTab==='splits'}" data-act="trtab" data-t="splits">${ic('layers')}Splits</button><button class="sg tb ${trTab==='overall'?'on':''}" role="tab" aria-selected="${trTab==='overall'}" data-act="trtab" data-t="overall">${ic('chart')}Overall</button><span class="tsep"></span>${TABS.map(g=>`<button class="sg cat ${trTab===g?'on':''} ${D.groups.includes(g)?'':'dim'}" role="tab" aria-selected="${trTab===g}" style="${catVars(GCOL[g])}" data-act="trtab" data-t="${g}" ${D.groups.includes(g)?'':'title="Not trained yet"'}><span class="sw"></span>${g}</button>`).join('')}</div><button class="tarr r" data-act="tscroll" data-d="1" aria-label="Jump to last tabs" hidden>${ic('back')}</button></div></div>`;
+   <div class="tabwrap"><button class="tarr l" data-act="tscroll" data-d="-1" aria-label="Jump to first tabs" hidden>${ic('back')}</button><div class="trtabs" id="trtabs" role="tablist" aria-label="Training views" data-sort="tabs" data-whole="1"><button class="sg tb ${trTab==='splits'?'on':''}" role="tab" aria-selected="${trTab==='splits'}" data-act="trtab" data-t="splits">${ic('layers')}Splits</button><button class="sg tb ${trTab==='overall'?'on':''}" role="tab" aria-selected="${trTab==='overall'}" data-act="trtab" data-t="overall">${ic('chart')}Overall</button><span class="tsep"></span>${TABS.map(g=>`<button class="sg cat ${trTab===g?'on':''} ${D.groups.includes(g)?'':'dim'}" role="tab" aria-selected="${trTab===g}" style="${catVars(GCOL[g])}" data-act="trtab" data-t="${g}" ${g!=='Custom'?`data-sid="${g}"`:''} title="${D.groups.includes(g)?'':'Not trained yet. '}Drag to reorder"><span class="sw"></span>${g}</button>`).join('')}</div><button class="tarr r" data-act="tscroll" data-d="1" aria-label="Jump to last tabs" hidden>${ic('back')}</button></div></div>`;
   const ecat=spEdit&&spEdit.draft.cat,okEx=id=>!ecat||catOfEx(id)===ecat||(exInfo(id).group==='Custom'&&!catOfEx(id));
   const rec=recentEx(10).filter(okEx),recS=new Set(rec);
   h+=`<datalist id="exlist">${rec.map(id=>`<option value="${esc(exInfo(id).name)}" label="Recently used · ${FMT[exInfo(id).fmt].side}"></option>`).join('')}${Object.entries(LIB).filter(([id])=>!recS.has(id)&&okEx(id)).map(([id,v])=>`<option value="${esc(v.name)}" label="${v.group} · ${FMT[v.fmt].side}"></option>`).join('')}${S.exlib.filter(x=>!recS.has(x.id)&&okEx(x.id)).map(x=>`<option value="${esc(x.name)}" label="Your exercise · ${FMT[exInfo(x.id).fmt].side}"></option>`).join('')}</datalist>`;
@@ -2189,10 +2204,11 @@ function splitCard(sp){
     logDraft.rows.forEach((r,i)=>{const f=exInfo(r.exId).fmt;h+=`<div class="exl lg ${r.on?'':'off'}"><button class="ck ${r.on?'on':''}" data-act="lgck" data-i="${i}" aria-label="Include">${ic('check')}</button><div class="exc"><span class="exn">${esc(exInfo(r.exId).name)}</span><span class="exm">${esc(FMT[f].side)}</span></div>${fieldsHTML(f,r,`data-f="lgn" data-i="${i}"`)}</div>`});
     if(!logDraft.rows.length)h+='<p class="hint">Add exercises to this split first.</p>';
     h+=`<div class="foot"><button class="btn" data-act="lgcancel">Cancel</button><span style="flex:1"></span><button class="btn pri" data-act="lgsave">${ic('check')}Save session</button></div></div>`;return h}
-  let h=`<div class="scard cat compact" style="${catVars(sp.col)}" data-act="spedit" data-id="${sp.id}" data-sid="${sp.id}" title="Open ${nm}">`+hd+
-   `<div class="spmeta">${ex.length} exercise${ex.length===1?'':'s'} · ${cnt?'last done '+dayLabel(last).toLowerCase():'not logged yet'}</div>`+
-   (ex.length?`<div class="spchips">${ex.map(i=>`<span class="spc">${esc(exInfo(i.exId).name)}</span>`).join('')}</div>`:`<p class="hint" style="margin:0">No exercises yet. Click to add some.</p>`)+
-   `<div class="foot"><span class="hint">${cnt} session${cnt===1?'':'s'} logged</span><button class="btn pri" data-act="splog" data-id="${sp.id}">${ic('check')}Log session</button></div></div>`;
+  const open=spOpen.has(sp.id),exl=sp.items.filter(i=>i.exId),when=cnt?dayLabel(last).toLowerCase():'not yet';
+  let h=`<div class="scard cat jc ${open?'open':''}" style="${catVars(sp.col)}" data-sid="${sp.id}"><button class="jch" data-act="sptog" data-id="${sp.id}" aria-expanded="${open}"><span class="grip" data-grip title="Drag to reorder" aria-hidden="true">${ic('grip')}</span><span class="cdot"></span><span class="spt">${nm}</span><span class="jmeta">${exl.length} ex${exl.length?' · '+when:''}</span>${ic('chev')}</button>`;
+  if(open)h+=`<div class="jbody">${exl.length?`<div class="jlist">${exl.map(i=>`<div class="jx"><span>${esc(exInfo(i.exId).name)}</span><span>${specOf(i)}</span></div>`).join('')}</div>`:'<p class="hint" style="margin:0">No exercises yet.</p>'}
+   <div class="jfoot"><span class="hint">${cnt} session${cnt===1?'':'s'}${cnt?' · last '+when:''}</span><span class="sp"></span><button class="btn" data-act="spedit" data-id="${sp.id}">${ic('edit')}Edit</button><button class="btn dan" data-act="spdel" data-id="${sp.id}" aria-label="Delete ${nm}" title="Delete">${ic('trash')}</button><button class="btn pri" data-act="splog" data-id="${sp.id}">${ic('check')}Log session</button></div></div>`;
+  h+='</div>';
   return h;
 }
 let spEdit=null;const spOpen=new Set();
@@ -2283,7 +2299,7 @@ document.addEventListener('click',e=>{
   case 'go':go(+t.dataset.p);break;
   case 'side':toggleSide();break;
   case 'spnew':{const cat=t.dataset.cat||'Chest',n=spGroups(cat).length;let k=n+1;while(S.splits.some(x=>x.name===cat+' '+k))k++;closePops();if(trTab!=='splits'){trTab='splits';S.set.trTab='splits'}
-    const sp={id:uid(),name:cat+' '+k,cat,col:GCOL[cat]==='slate'&&cat==='Cardio'?'teal':GCOL[cat],items:[{id:uid(),exId:'',sets:3,reps:10,w:''}]};startSpEdit(sp,true);focusSp(sp.id);break}
+    const L=S.splits.filter(x=>x.side!==1).length,R=S.splits.length-L;const sp={id:uid(),side:L>R?1:0,name:cat+' '+k,cat,col:GCOL[cat]==='slate'&&cat==='Cardio'?'teal':GCOL[cat],items:[{id:uid(),exId:'',sets:3,reps:10,w:''}]};startSpEdit(sp,true);focusSp(sp.id);break}
   case 'spnewpick':openCatPick(t,'spnew');break;
   case 'spsec':{const c=t.dataset.cat,set=new Set(S.set.spColl||[]);set.has(c)?set.delete(c):set.add(c);S.set.spColl=[...set];save();renderEx();break}
   case 'spfocus':{const sp=getSp(t.dataset.id);if(!sp)break;const set=new Set(S.set.spColl||[]);set.delete(sp.cat);S.set.spColl=[...set];logOpen=null;startSpEdit(sp,false);focusSp(sp.id);break}
@@ -2293,7 +2309,7 @@ document.addEventListener('click',e=>{
   case 'spok':commitSp();break;
   case 'spcancel':cancelSp();break;
   case 'spedit':{const sp=getSp(t.dataset.id);if(sp){logOpen=null;if(spEdit&&spEdit.draft.id===sp.id)break;startSpEdit(sp,false);focusSp(sp.id)}break}
-  case 'sptog':{const id=t.dataset.id,before=spRects();if(logOpen===id){logOpen=null;logDraft=null;spOpen.delete(id)}else spOpen.has(id)?spOpen.delete(id):spOpen.add(id);renderEx();spFlip(before,id);break}
+  case 'sptog':{const id=t.dataset.id;if(logOpen===id){logOpen=null;logDraft=null}spOpen.has(id)?spOpen.delete(id):spOpen.add(id);hov.hidden=true;renderEx();break}
   case 'spdel':{if(!armed(t,ic('check')))break;pushUndo();const id=t.dataset.id;S.splits=S.splits.filter(x=>x.id!==id);S.tts.forEach(tt=>tt.blocks.forEach(b=>{if(b.split===id)b.split=null;if(Array.isArray(b.tags))b.tags=b.tags.filter(x=>x!==id)}));if(logOpen===id)logOpen=null;save();renderEx();renderGrid();toast('Split deleted');break}
   case 'spcol':{const sp=spEdit&&spEdit.draft.id===t.dataset.id?spEdit.draft:null;if(!sp)break;openPal(t,sp.col,k=>{const f=$('spn-'+sp.id);if(f)sp.name=f.value;sp.col=k;renderEx()});break}
   case 'spadd':{const sp=spEdit&&spEdit.draft.id===t.dataset.id?spEdit.draft:null;if(!sp)break;sp.items.push({id:uid(),exId:''});renderEx();const el=[...document.querySelectorAll(`input.exs[data-s="${sp.id}"]`)].pop();el&&el.focus();break}
@@ -2464,6 +2480,8 @@ const SORTS={
  goals:{a:()=>S.goals,r:()=>renderGoals()},
  ms:{a:k=>(getG(k)||{}).ms,r:()=>renderGoals()},
  splits:{a:()=>S.splits,r:()=>renderEx()},
+ splitcol:{a:()=>S.splits,r:()=>renderEx(),board:true},
+ tabs:{apply:order=>{S.set.tabOrder=order;save();renderEx()}},
  spitems:{a:k=>spEdit&&spEdit.draft.id===k?spEdit.draft.items:null,r:()=>renderEx(),draft:true}};
 let srt=null,sortedAt=0;
 function flipMove(box,fn){const kids=[...box.children],r0=new Map(kids.map(c=>[c,c.getBoundingClientRect()]));fn();if(box.matches('.sgrid'))masonry();
@@ -2475,7 +2493,13 @@ document.addEventListener('pointerdown',e=>{if(e.button!==0)return;const g=e.tar
   if(g)e.preventDefault();srt={it,box,x0:e.clientX,y0:e.clientY,on:false,id:e.pointerId,lock:null}},true);
 document.addEventListener('pointermove',e=>{if(!srt||e.pointerId!==srt.id)return;
   if(!srt.on){if(Math.hypot(e.clientX-srt.x0,e.clientY-srt.y0)<6)return;srt.on=true;srt.it.classList.add('sorting');document.body.classList.add('is-sorting');hideHov&&hideHov();ctip.hidden=true;try{getSelection().removeAllRanges()}catch(x){}}
-  e.preventDefault();const it=srt.it,box=srt.box,sibs=[...box.children].filter(c=>c.dataset.sid&&c!==it);
+  e.preventDefault();const it=srt.it,box=srt.box;
+  if(box.dataset.sort==='splitcol'){const cols=[...box.parentElement.children].filter(c=>c.classList.contains('spcol'));
+    const col=cols.find(c=>{const r=c.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right});
+    if(col&&col!==box){const ks=[...col.children].filter(c=>c.dataset.sid),t=ks.find(c=>{const r=c.getBoundingClientRect();return e.clientY<r.top+r.height/2});
+      t?t.before(it):col.appendChild(it);srt.box=col;srt.lock=null;return}
+    if(col===box){const ks=[...box.children].filter(c=>c.dataset.sid&&c!==it),last=ks[ks.length-1];if(last&&e.clientY>last.getBoundingClientRect().bottom&&box.lastElementChild!==it){flipMove(box,()=>box.appendChild(it));srt.lock=null;return}}}
+  const sibs=[...srt.box.children].filter(c=>c.dataset.sid&&c!==it);
   const tgt=sibs.find(c=>{const r=c.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom});
   if(!tgt){srt.lock=null;return}if(tgt===srt.lock)return;
   const kids=[...box.children],after=kids.indexOf(tgt)>kids.indexOf(it),r=tgt.getBoundingClientRect(),ri=it.getBoundingClientRect();
@@ -2484,8 +2508,14 @@ document.addEventListener('pointermove',e=>{if(!srt||e.pointerId!==srt.id)return
   if(!past)return;flipMove(box,()=>{after?tgt.after(it):tgt.before(it)});srt.lock=tgt},{passive:false});
 function endSort(e){if(!srt||(e&&e.pointerId!==srt.id))return;const s0=srt;srt=null;if(!s0.on)return;
   s0.it.classList.remove('sorting');document.body.classList.remove('is-sorting');sortedAt=Date.now();
-  const def=SORTS[s0.box.dataset.sort],arr=def.a(s0.box.dataset.key);if(!arr)return;
-  const order=[...s0.box.children].map(c=>c.dataset.sid).filter(Boolean),pos=id=>{const i=order.indexOf(id);return i<0?1e9:i};
+  const def=SORTS[s0.box.dataset.sort];
+  if(def.apply){def.apply([...s0.box.children].map(c=>c.dataset.sid).filter(Boolean));return}
+  const arr=def.a(s0.box.dataset.key);if(!arr)return;
+  let order=[...s0.box.children].map(c=>c.dataset.sid).filter(Boolean);
+  if(def.board){const cols=[...s0.box.parentElement.children].filter(c=>c.classList.contains('spcol'));order=[];let moved=false;
+    cols.forEach((c,ci)=>[...c.children].forEach(k=>{if(!k.dataset.sid)return;order.push(k.dataset.sid);const sp=arr.find(x=>x.id===k.dataset.sid);if(sp&&sp.side!==ci){if(!moved){pushUndo();moved=true}sp.side=ci}}));
+    if(moved){const pos=id=>order.indexOf(id);arr.sort((a,b)=>pos(a.id)-pos(b.id));save();def.r();return}}
+  const pos=id=>{const i=order.indexOf(id);return i<0?1e9:i};
   const before=arr.map(x=>x.id).join();const sorted=arr.slice().sort((a,b)=>pos(a.id)-pos(b.id));if(sorted.map(x=>x.id).join()===before)return;
   const curQ=S.quotes[qi]&&S.quotes[qi].id;if(!def.draft)pushUndo();arr.splice(0,arr.length,...sorted);
   if(s0.box.dataset.sort==='quotes'){const j=S.quotes.findIndex(q=>q.id===curQ);if(j>=0)qi=j}
