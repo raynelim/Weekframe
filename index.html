@@ -1542,6 +1542,43 @@ button.spsh:hover{background:var(--sunk)}
 .dwband{position:absolute;left:0;right:0;top:84px;height:32px;border-radius:8px;background:var(--sunk);z-index:0;pointer-events:none}
 .dwf{display:flex;align-items:center;gap:8px;padding:10px 4px 2px;border-top:1px solid var(--line2);margin-top:8px}
 .dwf .sp{flex:1}.dwf .hint{font-size:12px}.dwf .btn{height:32px}
+
+.gnrow{display:flex;align-items:baseline;gap:10px;min-width:0;border-bottom:1.5px solid var(--line);transition:border-color .15s}
+.gnrow:focus-within{border-color:var(--ink)}
+.gnpre{font-size:30px;font-weight:600;letter-spacing:-.02em;color:var(--muted);flex:none;padding:6px 0 12px}
+.gnrow .gni{flex:1;min-width:0;border-bottom:0}
+@media (max-width:760px){.gnpre{font-size:24px}}
+.gfrow{display:flex;flex-direction:column;gap:8px}
+.gtagbox{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:42px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:text}
+.gtagbox:focus-within{border-color:var(--ink)}
+.gtagin{flex:1;min-width:140px;border:0;outline:0;background:none;font:inherit;font-size:14px;color:var(--ink);padding:4px 2px}
+.gptags{display:flex;flex-wrap:wrap;gap:6px}
+.gptags.big{margin-top:2px}
+.gptag{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);font-size:12.5px;color:var(--ink);white-space:nowrap}
+.gptag.ed{padding-right:3px}
+.gtagx{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:var(--muted)}
+.gtagx:hover{background:var(--line);color:var(--ink)}
+.gtagx svg{width:11px;height:11px}
+.gsw{display:flex;flex-wrap:wrap;gap:8px}
+.gsw .pd{width:26px;height:26px;transition:transform .12s}
+.gsw .pd:hover{transform:scale(1.08)}
+
+.cgl.cex{display:flex;align-items:center;gap:4px;background:none;color:var(--ink);padding:0 2px}
+.cgl.cex i{width:7px;height:7px;border-radius:50%;flex:none;border:1.5px solid var(--s);box-sizing:border-box}
+.cgl.cex.lg i{background:var(--s)}
+.cexl{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+.cexr{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;column-gap:10px;row-gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.cexr i{width:9px;height:9px;border-radius:50%;border:2px solid var(--s);box-sizing:border-box}
+.cexr.lg i{background:var(--s)}
+.cexr b{font-weight:600;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cexr .mo{font-size:12px;color:var(--muted)}
+.cexr .hint{grid-column:2/-1;font-size:12px}
+.logwk{gap:6px}.logwk svg{width:15px;height:15px}
+.logwk.done{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 35%,var(--line))}
+.logwk:disabled{opacity:.5;cursor:default}
+@media (max-width:760px){.cgl.cex{font-size:0;height:auto;padding:0}.cgl.cex i{width:6px;height:6px}.logwk .lbl{display:none}}
+
+.still,.still *{animation:none!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1572,7 +1609,8 @@ button.spsh:hover{background:var(--sunk)}
         <button class="ttname" id="ttname" data-act="open" data-mode="tts" aria-label="Switch timetable"></button>
         <div class="wkn"><button class="ib" data-act="vwk" data-d="-1" aria-label="Previous week" title="Previous week"><span class="ic" data-i="back"></span></button><button class="wkl" id="wklbl" data-act="vwk" data-d="0" title="Back to this week"></button><button class="ib fwd" data-act="vwk" data-d="1" aria-label="Next week" title="Next week"><span class="ic" data-i="back"></span></button></div>
         <div class="nn" id="nn"></div>
-        <button class="ib" id="selbtn" data-act="selmode" title="Select several blocks (or Shift click)" style="margin-left:auto"><span class="ic" data-i="select"></span><span class="lbl">Select</span></button>
+        <button class="btn logwk" id="logwk" data-act="logwk" style="margin-left:auto"></button>
+        <button class="ib" id="selbtn" data-act="selmode" title="Select several blocks (or Shift click)"><span class="ic" data-i="select"></span><span class="lbl">Select</span></button>
         <button class="ib" data-act="open" data-mode="stats" title="Stats"><span class="ic" data-i="chart"></span><span class="lbl">Stats</span></button>
       </div>
       <div id="banner"></div>
@@ -1687,6 +1725,7 @@ function seedExtras(o){
   ['splits','hist','exlib'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[]});
   if(!Array.isArray(o.goals))o.goals=[];
   if(!Array.isArray(o.projects))o.projects=[];
+  if(!o.wlog||typeof o.wlog!=='object')o.wlog={};
   if(!Array.isArray(o.quotes))o.quotes=[];
   if(!o.profile||typeof o.profile!=='object')o.profile={sex:'',age:'',h:'',w:o.set&&+o.set.bw?+o.set.bw:'',std:'who'};
   if(!Array.isArray(o.body))o.body=[];
@@ -1715,6 +1754,10 @@ const TT=()=>S.tts.find(t=>t.id===S.active);
 const getB=(id)=>TT().blocks.find(b=>b.id===id);
 const getC=(id)=>S.cats.find(c=>c.id===id);
 const colOf=(b)=>{const c=getC(b.cat);return c?c.col:'slate'};
+const TRAINRX=/gym|train|workout|exercis|fitness|sport|run|swim|cardio|lift|yoga|pilates|climb|cycl|bike|boxing|martial/i;
+function isTrainB(b){if(bTags(b).length)return true;const c=getC(b.cat);return !!(c&&TRAINRX.test(c.name||''))}
+function wlogSnap(wk){return WB(wk).filter(isTrainB).sort((a,b)=>a.d-b.d||a.s-b.s).map(b=>{const sp=bTags(b).map(getSp).filter(Boolean),c=getC(b.cat);return {d:b.d,s:b.s,e:b.e,title:sp.length?sp.map(x=>x.name||'Split').join(' + '):(b.title||(c?c.name:'Training')),col:sp.length?sp[0].col:colOf(b),splits:sp.map(x=>x.id)}})}
+function wlogState(wk){const L=S.wlog&&S.wlog[wk];if(!L)return 'none';return JSON.stringify(L.items)===JSON.stringify(wlogSnap(wk))?'ok':'stale'}
 const order=()=>S.set.weekStart==='sun'?[6,0,1,2,3,4,5]:[0,1,2,3,4,5,6];
 const vdays=()=>order().filter(d=>S.set.days.includes(d));
 const todayIdx=()=>(new Date().getDay()+6)%7;
@@ -1728,7 +1771,7 @@ const hrs=(m)=>{const h=m/60;return (Math.round(h*10)/10).toString().replace(/\.
 const toHM=(m)=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 const fromHM=(v)=>{const p=/^(\d{1,2}):(\d{2})$/.exec(v||'');return p?(+p[1])*60+(+p[2]):null};
 
-const UK=['cats','tts','active','splits','hist','exlib','goals','quotes','profile','body','projects'];
+const UK=['cats','tts','active','splits','hist','exlib','goals','quotes','profile','body','projects','wlog'];
 function snap(){const o={};UK.forEach(k=>o[k]=S[k]);return JSON.stringify(o)}
 function pushUndo(){U.push(snap());if(U.length>80)U.shift();R.length=0}
 function restore(str){const o=JSON.parse(str);UK.forEach(k=>S[k]=o[k]);if(sel&&!getB(sel))sel=null;[...msel].forEach(id=>{if(!getB(id))msel.delete(id)})}
@@ -1747,10 +1790,11 @@ function lanes(list){
 function renderTop(){
   {const cw=curWk(),diff=Math.round((ymdP(viewWk)-ymdP(cw))/6048e5),e=ymdP(viewWk);e.setDate(e.getDate()+6);const l=$('wklbl');if(l){l.innerHTML=`<b>${diff===0?'This week':diff===1?'Next week':diff===-1?'Last week':(diff>0?'In '+diff+' weeks':(-diff)+' weeks ago')}</b><span>${shortD(viewWk)} to ${shortD(ymd(e))}</span>`;l.classList.toggle('cur',diff===0)}}
   $('ttname').innerHTML=esc(TT().name)+ic('chev');
+  {const lb=$('logwk');if(lb){const st=wlogState(viewWk),n=wlogSnap(viewWk).length;delete lb.dataset.armed;lb.classList.remove('armed');lb.classList.toggle('pri',st!=='ok');lb.classList.toggle('done',st==='ok');lb.innerHTML=st==='ok'?ic('check')+'<span class="lbl">Week logged</span>':st==='stale'?ic('calendar')+'<span class="lbl">Update log</span>':ic('calendar')+'<span class="lbl">Log week</span>';lb.title=st==='ok'?'On your calendar. Click twice to unlog':st==='stale'?'You changed this week since logging. Update the calendar':n?`Put this week's ${n} training block${n===1?'':'s'} on your calendar`:'No training blocks this week yet';lb.disabled=st==='none'&&!n}}
   document.querySelectorAll('.ic').forEach(el=>{el.outerHTML=ic(el.dataset.i)});
   document.querySelector('[data-act=undo].ib').innerHTML=ic('undo');
   document.querySelector('[data-act=redo].ib').innerHTML=ic('redo');
-  $('banner').innerHTML=S.example?`<div class="banner"><span><b>This is an example week.</b> Drag blocks around to try it, then clear it and build your own.</span><span class="sp"></span><button class="lk" data-act="startblank">Start blank</button><button class="lk" data-act="keepex">Keep and edit</button></div>`:(()=>{const cw=curWk(),diff=Math.round((ymdP(viewWk)-ymdP(cw))/6048e5),src=WB().length?null:lastPlannedWk();return src?`<div class="banner"><span><b>${diff===0?'This week':diff===1?'Next week':diff===-1?'Last week':'The week of '+shortD(viewWk)} has no plans yet.</b> Copy your schedule from ${src===wkShift(viewWk,-1)?'last week':'the week of '+shortD(src)} (${WB(src).length} blocks), or start fresh by dragging on the grid.</span><span class="sp"></span><button class="btn pri" data-act="copywk" data-w="${src}">${ic('copy')}Copy ${src===wkShift(viewWk,-1)?'last week':'that week'}</button></div>`:''})();
+  $('banner').innerHTML=S.example?`<div class="banner"><span><b>This is an example week.</b> Drag blocks around to try it, then clear it and build your own.</span><span class="sp"></span><button class="lk" data-act="startblank">Start blank</button><button class="lk" data-act="keepex">Keep and edit</button></div>`:(()=>{const cw=curWk(),diff=Math.round((ymdP(viewWk)-ymdP(cw))/6048e5),src=WB().length?null:lastPlannedWk();return src?`<div class="banner"><span><b>${diff===0?'This week':diff===1?'Next week':diff===-1?'Last week':'The week of '+shortD(viewWk)} has no plans yet.</b> Carry over your schedule from ${src===wkShift(viewWk,-1)?'last week':'the week of '+shortD(src)} (${WB(src).length} blocks), or start fresh by dragging on the grid.</span><span class="sp"></span><button class="btn pri" data-act="copywk" data-w="${src}">${ic('copy')}Carry over ${src===wkShift(viewWk,-1)?'last week':'that week'}</button></div>`:''})();
 }
 function renderNow(){
   const d=todayIdx(),n=nowMin(),bl=WB(curWk()).filter(b=>b.d===d).sort((a,b)=>a.s-b.s);
@@ -1900,6 +1944,8 @@ document.addEventListener('click',e=>{
   case 'undo':undo();break;case 'redo':redo();break;
   case 'zoom':st.hourH=clamp(st.hourH+(+t.dataset.z)*8,32,120);save();renderGrid();refreshDrawer();break;
   case 'focus':{S.focus=S.focus===t.dataset.id?null:t.dataset.id;save();renderChips();const c=getC(S.focus);toast(c?`New blocks will be ${c.name}`:'New blocks use your first category',false);break}
+  case 'logwk':{const st=wlogState(viewWk);if(st==='ok'){if(!armed(t,ic('x')+'<span class="lbl">Tap to unlog</span>'))break;pushUndo();delete S.wlog[viewWk];save();renderTop();toast('Week removed from calendar');break}
+    const it=wlogSnap(viewWk);if(!it.length){toast('Add a training block first');break}pushUndo();S.wlog[viewWk]={at:Date.now(),items:it};save();renderTop();toast(`${it.length} training block${it.length===1?'':'s'} added to calendar`);break}
   case 'startblank':pushUndo();TT().blocks=TT().blocks.filter(b=>b.wk!==viewWk);TT().name='My week';S.example=false;save();renderAll();toast('Cleared. Drag on the grid to add your first block');break;
   case 'keepex':S.example=false;save();renderTop();break;
   case 'setcat':editB(b=>b.cat=t.dataset.id||null);refreshDrawer();break;
@@ -2211,7 +2257,7 @@ const PN=['profile','week','training','goals','calendar'];
 let page=PN.indexOf((location.hash||'').slice(1));if(page<0)page=1;
 const track=$('track'),tabs=$('tabs'),pager=$('pager'),pages=[...track.children];
 function placeInd(){const b=tabs.querySelector('.tab.on'),ind=$('tabind');if(!b)return;ind.style.left=b.offsetLeft+'px';ind.style.width=b.offsetWidth+'px'}
-function go(i,quiet){const prevPage=page;page=clamp(i,0,4);if(page===0&&(prevPage!==0||quiet)){animPie=true;renderProf()}if(page===2&&prevPage!==2&&typeof renderEx==='function'){animPie=true;renderEx()}if(page===4)renderCal();if(page!==2&&gview){gview=null;$('gview').hidden=true}track.style.transform=`translateX(${-page*100}%)`;
+function go(i,quiet){const prevPage=page;page=clamp(i,0,4);if(prevPage!==page){const pe=$(['p-prof','p-week','p-ex','p-goals','p-cal'][page]);if(pe){pe._sk=null;pe.classList.remove('still')}}if(page===0&&(prevPage!==0||quiet)){animPie=true;renderProf()}if(page===2&&prevPage!==2&&typeof renderEx==='function'){animPie=true;renderEx()}if(page===4)renderCal();if(page!==2&&gview){gview=null;$('gview').hidden=true}track.style.transform=`translateX(${-page*100}%)`;
   tabs.querySelectorAll('.tab').forEach((b,j)=>{b.classList.toggle('on',j===page);b.setAttribute('aria-selected',String(j===page))});
   pages.forEach((p,j)=>{p.inert=j!==page});placeInd();pager.scrollLeft=0;
   if(!quiet&&location.hash.slice(1)!==PN[page]){try{history.replaceState(null,'','#'+PN[page])}catch(e){try{location.hash=PN[page]}catch(x){}}}
@@ -2525,7 +2571,7 @@ function renderEx(){syncCatCols();
   const rec=recentEx(10).filter(okEx),recS=new Set(rec);
   h+=`<datalist id="exlist">${rec.map(id=>`<option value="${esc(exInfo(id).name)}" label="Recently used · ${FMT[exInfo(id).fmt].side}"></option>`).join('')}${Object.entries(LIB).filter(([id])=>!recS.has(id)&&okEx(id)).map(([id,v])=>`<option value="${esc(v.name)}" label="${v.group} · ${FMT[v.fmt].side}"></option>`).join('')}${S.exlib.filter(x=>!recS.has(x.id)&&okEx(x.id)).map(x=>`<option value="${esc(x.name)}" label="Your exercise · ${FMT[exInfo(x.id).fmt].side}"></option>`).join('')}</datalist>`;
   h+=`<div class="trb"><div class="trm" id="tr-main">${trTab==='splits'?splitsBody():trTab==='overall'?overallBody(D):groupBody(trTab,D)}</div>${ids.length?`<div class="card trlist" id="lt-res" hidden><div class="lab">Matching exercises</div>${ids.map(exRow).join('')}</div><p class="hint" id="lt-none" hidden>No exercises match that search.</p>`:''}</div>`;
-  P.innerHTML=h;lastTab=trTab;initTabs(tsl);if(trTab==='splits'){masonry();spObserve()}if(animPie){const b=P.querySelectorAll('.trviz .bars');b.forEach(x=>x.classList.add('anim'))}animPie=false;
+  still(P,'tr|'+trTab);P.innerHTML=h;lastTab=trTab;initTabs(tsl);if(trTab==='splits'){masonry();spObserve()}if(animPie){const b=P.querySelectorAll('.trviz .bars');b.forEach(x=>x.classList.add('anim'))}animPie=false;
   const nl=P.querySelector('#tr-main .trlist,#tr-main .trsc');if(nl&&st)nl.scrollTop=st;if(preB)boardFlip(preB);
   const GV=$('gview');GV.hidden=true;GV.innerHTML='';gview=null;
   filterLt();
@@ -2620,7 +2666,7 @@ const GSTAT={on:'On',notyet:'Not started',off:'Off'};
 function normMs(m){return {id:m.id||uid(),t:m.t||'',desc:m.desc||m.note||'',due:m.due||'',time:m.time||'',urg:+m.urg||50,d:!!m.d,doneAt:m.doneAt||(m.d?todayS():'')}}
 function normGoal(g){g.title=g.title||'';g.desc=g.desc||'';g.start=g.start||todayS();g.due=g.due||'';g.status=GSTAT[g.status]?g.status:'on';g.sort=g.sort||'due';
   g.ms=(g.ms||[]).map(normMs);g.checkin=g.checkin||{freq:'off',day:6};g.log=Array.isArray(g.log)?g.log:[];g.phases=[];return g}
-function normProj(p){p.name=p.name||'';p.desc=p.desc||'';p.col=p.col||'blue';p.goals=(p.goals||[]).map(normGoal);p.goals.forEach(g=>g.col=p.col);return p}
+function normProj(p){p.name=p.name||'';p.desc=p.desc||'';p.col=p.col||'blue';p.tags=Array.isArray(p.tags)?p.tags:[];p.goals=(p.goals||[]).map(normGoal);p.goals.forEach(g=>g.col=p.col);return p}
 function migrateGoals(){if(!Array.isArray(S.projects))S.projects=[];
   if(Array.isArray(S.goals)&&S.goals.length){S.goals.forEach(o=>{S.projects.push(normProj({id:uid(),name:o.title||'Untitled project',desc:o.desc||o.why||'',col:o.col||'blue',goals:[{id:o.id||uid(),title:o.title||'Main goal',desc:o.why||o.desc||'',start:o.start||todayS(),due:o.due||'',status:o.status==='paused'?'off':o.status==='planning'?'notyet':'on',ms:o.ms||[],checkin:o.checkin,log:o.log}]}))});S.goals=[];save()}
   S.projects.forEach(normProj)}
@@ -2644,7 +2690,9 @@ function nextCheckin(g){const c=g.checkin;if(!c||c.freq==='off'||g.status==='off
 function checkinsIn(g,ds){const c=g.checkin;if(!c||c.freq==='off'||g.status==='off'||ds<g.start||(g.due&&ds>g.due))return false;const d=ymdP(ds);if(((d.getDay()+6)%7)!==+c.day)return false;if(c.freq==='week')return true;if(c.freq==='fortnight')return Math.floor(dBetween(g.start,ds)/7)%2===0;return d.getDate()<=7}
 const shortDY=ds=>ymdP(ds).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
 const fmtT=t=>{if(!t)return '';const [h,m]=t.split(':').map(Number);return fmt(h*60+m)};
-const dispName=(p,g)=>`${esc(p.name||'Untitled project')}<span class="gsep">-</span>${esc(g.title||'Untitled goal')}`;
+const pName=p=>{const n=((p&&p.name)||'').trim();return !n?'Untitled project':/^project\b/i.test(n)?n:'Project '+n};
+const pTags=(p,cls)=>p.tags&&p.tags.length?`<div class="gptags ${cls||''}">${p.tags.map(t=>`<span class="gptag">${esc(t)}</span>`).join('')}</div>`:'';
+const dispName=(p,g)=>`${esc(pName(p))}<span class="gsep">-</span>${esc(g.title||'Untitled goal')}`;
 function goalChart(g,W,H){W=W||640;H=H||240;const [x0,x1]=gRange(g),{proj,act}=gLines(g),pl=42,pr=16,pt=22,pb=34,span=dBetween(x0,x1)||1;
   const X=ds=>pl+Math.max(0,Math.min(1,dBetween(x0,ds)/span))*(W-pl-pr),Y=v=>pt+(1-v)*(H-pt-pb);let s=`<svg viewBox="0 0 ${W} ${H}" class="chart gchart" role="img" aria-label="Projected and actual progress">`;
   [0,.5,1].forEach(v=>{s+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}" class="cg"/><text x="${pl-8}" y="${Y(v)+4}" text-anchor="end" class="ct">${v*100}%</text>`});
@@ -2669,30 +2717,34 @@ function projHome(){const P=S.projects,AG=allGoals().filter(x=>x.g.status!=='off
   if(!P.length)return h+`<div class="card empty gempty"><b>Start your first project</b>Give it a name and a description, then add goals with their own timelines and milestones.<div class="row" style="justify-content:center;margin-top:14px"><button class="btn pri" data-act="g_new">${ic('plus')}New project</button></div></div>`;
   h+=`<div class="ghome ${pManage?'managing':''}" data-sort="projects">`;
   P.forEach(p=>{const gs=p.goals,n=gs.filter(g=>g.status==='on').map(g=>({g,m:nextMs(g)})).filter(x=>x.m).sort((a,b)=>(a.m.due||'9')<(b.m.due||'9')?-1:1)[0],sel=pSel.has(p.id);
-    h+=`<div class="gc cat ${sel?'sel':''}" style="${catVars(p.col)}" data-sid="${p.id}" data-act="${pManage?'g_psel':'g_open'}" data-id="${p.id}" tabindex="0" role="button" aria-label="${pManage?'Select':'Open'} ${esc(p.name||'project')}">
-     <div class="gch">${pManage?`<span class="ck ${sel?'on':''}">${ic('check')}</span>`:`<span class="grip" data-grip title="Drag to reorder" aria-hidden="true">${ic('grip')}</span>`}<span class="gdot2"></span><b>${esc(p.name||'Untitled project')}</b>${pManage?'':`<button class="ib gpen" data-act="g_pedit" data-id="${p.id}" aria-label="Edit name and description" title="Edit name and description">${ic('edit')}</button>`}</div>
-     ${p.desc?`<div class="gpdesc">${esc(p.desc)}</div>`:''}
+    h+=`<div class="gc cat ${sel?'sel':''}" style="${catVars(p.col)}" data-sid="${p.id}" data-act="${pManage?'g_psel':'g_open'}" data-id="${p.id}" tabindex="0" role="button" aria-label="${pManage?'Select':'Open'} ${esc(pName(p))}">
+     <div class="gch">${pManage?`<span class="ck ${sel?'on':''}">${ic('check')}</span>`:`<span class="grip" data-grip title="Drag to reorder" aria-hidden="true">${ic('grip')}</span>`}<span class="gdot2"></span><b>${esc(pName(p))}</b>${pManage?'':`<button class="ib gpen" data-act="g_pedit" data-id="${p.id}" aria-label="Edit project" title="Edit project">${ic('edit')}</button>`}</div>
+     ${p.desc?`<div class="gpdesc">${esc(p.desc)}</div>`:''}${pTags(p)}
      <div class="gcgl">${gs.length?gs.map(g=>`<div class="gcg ${g.status}"><span class="gcgt">${esc(g.title||'Untitled goal')}</span>${g.status==='on'?`<span class="gpb sm"><i style="width:${gProg(g)}%"></i></span><span class="mo">${gProg(g)}%</span>`:gstatPill(g.status)}</div>`).join(''):'<span class="hint">No goals yet</span>'}</div>
      <div class="gnext">${n?`Next: <b>${esc(n.m.t||'Untitled')}</b>${n.m.due?` · ${msStat(n.m)[0].toLowerCase()}`:''}`:`${gs.length} goal${gs.length===1?'':'s'}`}</div></div>`});
   return h+(pManage?'':`<button class="gc gcnew" data-act="g_new">${ic('plus')}New project</button>`)+'</div>'}
 function projForm(){const ed=gv==='pedit',p=ed?getP(pOpen):null;
   return `<div class="gtopbar"><button class="lk" data-act="${ed&&gFrom==='goal'?'g_back':'g_home'}">${ic('back')}${ed&&gFrom==='goal'?'Back to project':'All projects'}</button></div>
   <div class="card gname"><span class="lab">${ed?'Edit project':'New project'}</span>
-   <input class="gni" id="g-name" data-f="gname" value="${esc(gName)}" placeholder="Project name, like Become rich" autocomplete="off" aria-label="Project name">
+   <div class="gnrow"><span class="gnpre">Project</span><input class="gni" id="g-name" data-f="gname" value="${esc(gName.replace(/^project\s+/i,''))}" placeholder="name, like ABC" autocomplete="off" aria-label="Project name"></div>
    <textarea class="inp gpdin" id="g-pdesc" data-f="gpdesc" rows="4" placeholder="Describe the project. What is it about, and why does it matter to you?" aria-label="Project description">${esc(gPDesc)}</textarea>
+   <div class="gfrow"><span class="lab">Tags</span><div class="gtagbox" id="g-tags">${gTagBox()}</div></div>
+   <div class="gfrow"><span class="lab">Colour</span><div class="gsw" role="radiogroup" aria-label="Project colour">${PKEYS.map(k=>`<button class="pd cat ${k===gColP?'on':''}" style="${catVars(k)}" data-act="g_pcol" data-k="${k}" role="radio" aria-checked="${k===gColP}" aria-label="${cap(k)}" title="${cap(k)}"></button>`).join('')}</div></div>
    <p class="err" id="g-name-err" hidden>Give your project a name first.</p>
    <div class="gnf">${ed?`<span class="hint">Goals aren't affected.</span>`:`<span class="hint">You'll add goals after creating the project.</span>`}<span class="sp"></span>${ed?`<button class="btn" data-act="${gFrom==='goal'?'g_back':'g_home'}">Cancel</button>`:''}<button class="btn pri" data-act="g_start">${ed?ic('check')+'Save':ic('plus')+'Create project'}</button></div></div>`}
-let gFrom='home',gPDesc='';
+let gFrom='home',gPDesc='',gTags=[],gColP='blue';
+function gTagBox(){return gTags.map((t,i)=>`<span class="gptag ed">${esc(t)}<button class="gtagx" data-act="g_tagdel" data-i="${i}" aria-label="Remove ${esc(t)}">${ic('x')}</button></span>`).join('')+`<input class="gtagin" id="g-tagin" placeholder="${gTags.length?'Add tag':'Type a tag and press Enter'}" autocomplete="off" aria-label="Add tag">`}
+function gTagAdd(v){v=(v||'').trim().replace(/,$/,'').trim();if(v&&!gTags.some(x=>x.toLowerCase()===v.toLowerCase()))gTags.push(v.slice(0,30));const b=$('g-tags');if(b){b.innerHTML=gTagBox();const i=$('g-tagin');i&&i.focus()}}
 function msForm(m,isNew){return `<div class="gmsc gmsform"><div class="gmsh"><input class="inp gmsn" id="ms-t" data-f="msd" data-k="t" value="${esc(m.t)}" placeholder="Milestone name" aria-label="Milestone name" autocomplete="off"><input class="inpd" type="date" data-f="msd" data-k="due" value="${m.due}" aria-label="Date"><input class="inpd gtime" type="time" data-f="msd" data-k="time" value="${m.time}" aria-label="Time, optional" title="Time, optional"></div>
    <textarea class="inp" rows="2" data-f="msd" data-k="desc" placeholder="What does this milestone involve? (optional)">${esc(m.desc)}</textarea>
    <div class="gmsf2"><div class="gfld"><span class="k">Urgency</span>${urgPick(m.urg,'g_msurg')}</div><span class="sp"></span><button class="btn" data-act="g_mscancel">Cancel</button><button class="btn pri" data-act="g_msok">${ic('check')}${isNew?'Add':'Save'}</button></div><p class="err" id="ms-err" hidden>Give the milestone a name.</p></div>`}
 function goalEdit(){const p=getP(pOpen),g=gDraft;if(!p||!g){gv='goal';return projPage()}const DAYN=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];g.col=p.col;
   const ord=g.ms.slice().sort((a,b)=>((a.due||'9')+a.time)<((b.due||'9')+b.time)?-1:1);
-  let h=`<div class="gtopbar"><button class="lk" data-act="g_gcancel">${ic('back')}${esc(p.name||'Project')}</button><span class="sp"></span><span class="hint">${gDraftNew?'New goal':'Editing goal'}</span></div>
+  let h=`<div class="gtopbar"><button class="lk" data-act="g_gcancel">${ic('back')}${esc(pName(p))}</button><span class="sp"></span><span class="hint">${gDraftNew?'New goal':'Editing goal'}</span></div>
   <div class="card gsetup cat" style="${catVars(p.col)}">
    <section class="gss gss0"><div class="gssh"><span class="lab">Goal</span><span class="sp"></span><div class="seg sm">${Object.entries(GSTAT).map(([v,l])=>`<button class="sg ${g.status===v?'on':''}" data-act="g_dstat" data-v="${v}">${l}</button>`).join('')}</div></div>
     <input class="gsti" id="gd-title" data-f="gd" data-k="title" value="${esc(g.title)}" placeholder="Name your goal, like Make my first $1000" aria-label="Goal name">
-    <div class="gpre hint">${esc(p.name)}<span class="gsep">-</span>${esc(g.title||'your goal')}</div></section>
+    <div class="gpre hint">${esc(pName(p))}<span class="gsep">-</span>${esc(g.title||'your goal')}</div></section>
    <section class="gss"><div class="gssh"><span class="lab">Description</span></div><textarea class="inp gfdesc" rows="6" data-f="gd" data-k="desc" placeholder="What does reaching this goal look like? How will you get there? Anything you want to remember.">${esc(g.desc)}</textarea></section>
    <section class="gss"><div class="gssh"><span class="lab">Timeline</span>${g.due?`<span class="hint">${dBetween(g.start,g.due)} days</span>`:''}</div><div class="gtlr"><input class="inpd" type="date" data-f="gdd" data-k="start" value="${g.start}" aria-label="Start date"><span class="hint">to</span><input class="inpd" type="date" data-f="gdd" data-k="due" value="${g.due}" aria-label="End date"></div></section>
    <section class="gss"><div class="gssh"><span class="lab">Milestones</span><span class="hint">${g.ms.length}</span></div>
@@ -2706,7 +2758,7 @@ function goalEdit(){const p=getP(pOpen),g=gDraft;if(!p||!g){gv='goal';return pro
 function projPage(){const p=getP(pOpen);if(!p){gv='home';return projHome()}
   if(!p.goals.find(g=>g.id===gSel))gSel=(p.goals.find(g=>g.status==='on')||p.goals[0]||{}).id;const g=p.goals.find(x=>x.id===gSel);
   let h=`<div class="gtopbar"><button class="lk" data-act="g_home">${ic('back')}All projects</button><span class="sp"></span><button class="btn dan" data-act="g_del" aria-label="Delete project" title="Delete project">${ic('trash')}</button></div>
-  <div class="gproj cat" style="${catVars(p.col)}"><div class="ght"><span class="gdot2 big"></span><h1>${esc(p.name||'Untitled project')}</h1><button class="ib" data-act="g_pedit" data-id="${p.id}" aria-label="Edit name and description" title="Edit name and description">${ic('edit')}</button></div>${p.desc?`<p class="gdesc">${esc(p.desc)}</p>`:''}</div>`;
+  <div class="gproj cat" style="${catVars(p.col)}"><div class="ght"><span class="gdot2 big"></span><h1>${esc(pName(p))}</h1><button class="ib" data-act="g_pedit" data-id="${p.id}" aria-label="Edit project" title="Edit project">${ic('edit')}</button></div>${p.desc?`<p class="gdesc">${esc(p.desc)}</p>`:''}${pTags(p,'big')}</div>`;
   if(!p.goals.length)return h+`<div class="card gempty2 gbig"><b>Create your first goal</b><span class="hint">Each goal has its own description, timeline, milestones and check ins.</span><button class="btn pri" data-act="g_gnew">${ic('plus')}Create a goal</button></div>`;
   h+=`<div class="gptabs">${p.goals.map(x=>`<button class="gpt cat ${x.id===gSel?'on':''} ${x.status}" style="${catVars(p.col)}" data-act="g_gsel" data-id="${x.id}"><span class="gptn">${esc(x.title||'Untitled goal')}</span><span class="gptm">${x.status==='on'?`<span class="gpb sm"><i style="width:${gProg(x)}%"></i></span>${gProg(x)}%`:GSTAT[x.status]}</span></button>`).join('')}<button class="gpt gptadd" data-act="g_gnew">${ic('plus')}Create a goal</button></div>`;
   const pc=gPct(g),tr=gTrack(g),n=nextMs(g),dl=g.due?daysLeft(g.due):null,nc=nextCheckin(g);
@@ -2727,14 +2779,15 @@ function projPage(){const p=getP(pOpen);if(!p){gv='home';return projHome()}
     <div class="gcif"><input class="inp" id="gci-note" placeholder="How's it going?"><button class="btn" data-act="g_log">${ic('check')}Log</button></div>
     ${g.log.length?`<div class="gcil">${g.log.slice(-4).reverse().map(l=>`<div class="gcir"><span class="mo">${shortD(l.date)}</span><span>${esc(l.note||'')}</span></div>`).join('')}</div>`:'<p class="hint" style="margin:0">Log a quick note on how it\'s going any time.</p>'}</div></div></div>`;
   return h}
-function renderGoals(){qShownAt=Date.now();const P=$('p-goals');if(!P)return;migrateGoals();
+function still(P,key){P.classList.toggle('still',P._sk===key);P._sk=key}
+function renderGoals(){qShownAt=Date.now();const P=$('p-goals');if(!P)return;migrateGoals();still(P,gv+'|'+pOpen);
   if((gv==='goal'||gv==='gedit'||gv==='pedit')&&!getP(pOpen))gv='home';if(gv==='gedit'&&!gDraft)gv='goal';
   P.innerHTML=`<div class="gvw gv-${gv}">${gv==='home'?projHome():gv==='name'||gv==='pedit'?projForm():gv==='gedit'?goalEdit():projPage()}</div>`;fitQuote()}
 function gGo(v,keepScroll){gv=v;renderGoals();if(!keepScroll){const P=$('p-goals');P&&(P.scrollTop=0)}if(v==='name'||v==='pedit')setTimeout(()=>{const f=$('g-name');if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length)}},40)}
 const focusSel=sel=>setTimeout(()=>{const f=document.querySelector(sel);if(f){f.focus();f.scrollIntoView({block:'center',behavior:motionOK()?'smooth':'auto'})}},40);
-function gStart(){const nm=(gName||'').trim();if(!nm){const e=$('g-name-err');e&&(e.hidden=false);$('g-name')&&$('g-name').focus();return}
-  if(gv==='pedit'){const p=getP(pOpen);if(p){pushUndo();p.name=nm;p.desc=gPDesc.trim();save();toast('Project updated')}gName='';gPDesc='';gGo(gFrom==='goal'?'goal':'home');return}
-  pushUndo();const p=normProj({id:uid(),name:nm,desc:gPDesc.trim(),col:nextCol(S.projects.map(x=>x.col)),goals:[]});S.projects.push(p);save();pOpen=p.id;gSel=null;gName='';gPDesc='';gGo('goal');toast(`${p.name} created`)}
+function gStart(){const ti=$('g-tagin');if(ti&&ti.value.trim())gTagAdd(ti.value);const nm=(gName||'').trim().replace(/^project\s+/i,'');if(!nm){const e=$('g-name-err');e&&(e.hidden=false);$('g-name')&&$('g-name').focus();return}
+  if(gv==='pedit'){const p=getP(pOpen);if(p){pushUndo();p.name=nm;p.desc=gPDesc.trim();p.tags=gTags.slice();p.col=gColP;p.goals.forEach(g=>g.col=gColP);save();toast('Project updated')}gName='';gPDesc='';gGo(gFrom==='goal'?'goal':'home');return}
+  pushUndo();const p=normProj({id:uid(),name:nm,desc:gPDesc.trim(),tags:gTags.slice(),col:gColP,goals:[]});S.projects.push(p);save();pOpen=p.id;gSel=null;gName='';gPDesc='';gGo('goal');toast(`${pName(p)} created`)}
 function curGoal(){const p=getP(pOpen);return p&&p.goals.find(g=>g.id===gSel)}
 function openGoalEdit(isNew){const p=getP(pOpen);if(!p)return;gDraftNew=isNew;msEdit=null;msDraft=null;
   gDraft=isNew?normGoal({id:uid(),title:'',desc:'',start:todayS(),due:gPreDue||'',status:'on',ms:[]}):JSON.parse(JSON.stringify(curGoal()));gPreDue='';gDraft.col=p.col;gGo('gedit');if(isNew)focusSel('#gd-title')}
@@ -2746,10 +2799,12 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(
   switch(a){
   case 'g_home':pManage=false;pSel.clear();gGo('home');break;
   case 'g_back':gGo('goal');break;
-  case 'g_new':gName='';gPDesc='';gFrom='home';gGo('name');break;
+  case 'g_new':gName='';gPDesc='';gTags=[];gColP=nextCol(S.projects.map(x=>x.col));gFrom='home';gGo('name');break;
+  case 'g_pcol':{gColP=t.dataset.k;document.querySelectorAll('[data-act=g_pcol]').forEach(b=>{const on=b===t;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)});break}
+  case 'g_tagdel':{gTags.splice(+t.dataset.i,1);gTagAdd('');break}
   case 'g_start':gStart();break;
   case 'g_open':if(e.target.closest('.grip,.gpen'))break;pOpen=t.dataset.id;gSel=null;gmsOpen.clear();gGo('goal');break;
-  case 'g_pedit':{e.stopPropagation();const p=getP(t.dataset.id);if(!p)break;gFrom=gv==='goal'?'goal':'home';pOpen=p.id;gName=p.name;gPDesc=p.desc;gGo('pedit');break}
+  case 'g_pedit':{e.stopPropagation();const p=getP(t.dataset.id);if(!p)break;gFrom=gv==='goal'?'goal':'home';pOpen=p.id;gName=p.name;gPDesc=p.desc;gTags=(p.tags||[]).slice();gColP=p.col;gGo('pedit');break}
   case 'g_pman':pManage=!pManage;pSel.clear();renderGoals();break;
   case 'g_psel':{const id=t.dataset.id;pSel.has(id)?pSel.delete(id):pSel.add(id);renderGoals();break}
   case 'g_pselall':if(pSel.size===S.projects.length)pSel.clear();else S.projects.forEach(p=>pSel.add(p.id));renderGoals();break;
@@ -2791,6 +2846,8 @@ document.addEventListener('change',e=>{const t=e.target,f=t.dataset&&t.dataset.f
   else if(f==='msd'&&msDraft&&t.type!=='text'&&t.tagName==='INPUT'&&(t.dataset.k==='due'||t.dataset.k==='time'))msDraft[t.dataset.k]=t.value
   else if(f==='gcid'&&gDraft)gDraft.checkin.day=+t.value});
 let qEditStart=false;
+document.addEventListener('mousedown',e=>{const b=e.target.closest&&e.target.closest('.gtagbox');if(!b||e.target.closest('button,input'))return;e.preventDefault();const i=$('g-tagin');i&&i.focus()});
+document.addEventListener('keydown',e=>{const t=e.target;if(!t||t.id!=='g-tagin')return;if(e.key==='Enter'||e.key===','){e.preventDefault();e.stopPropagation();if(t.value.trim())gTagAdd(t.value);else if(e.key==='Enter')gStart()}else if(e.key==='Backspace'&&!t.value&&gTags.length){e.preventDefault();gTags.pop();gTagAdd('')}},true);
 document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.qok'))e.preventDefault()},true);
 function caretAt(el,n){try{const r=document.createRange(),tn=el.firstChild;if(!tn){el.focus();return}r.setStart(tn,Math.min(n,tn.length));r.collapse(true);const sl=getSelection();sl.removeAllRanges();sl.addRange(r)}catch(e){}}
 document.addEventListener('focusin',e=>{const f=e.target.dataset&&e.target.dataset.f;if(f!=='qtx'&&f!=='qby')return;if(qEditStart){qEditStart=false;return}pushUndo()});
@@ -3073,7 +3130,10 @@ let calM=null,calSel=null;
 function renderCal(){const P=$('p-cal');if(!P)return;const today=ymd(new Date());if(!calSel)calSel=today;if(!calM){const d=ymdP(calSel);calM=new Date(d.getFullYear(),d.getMonth(),1)}
   const start=monOf(calM),days=[];for(let i=0;i<42;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d)}
   const byDate={};S.hist.forEach(h=>{(byDate[h.date]=byDate[h.date]||[]).push(h)});
-  migrateGoals();const gBy={},push=(d,x)=>(gBy[d]=gBy[d]||[]).push(x),AG=allGoals().filter(x=>x.g.status!=='off');AG.forEach(({p,g})=>{if(g.due)push(g.due,{_gd:1,p,g,col:p.col,title:(p.name||'Project')+' - '+(g.title||'goal')});g.ms.forEach(m=>{if(m.due)push(m.due,{_ms:1,p,g,m,col:p.col,title:m.t||'Milestone'})})});
+  const exOf=ds=>{const d=ymdP(ds),dow=(d.getDay()+6)%7,L=S.wlog&&S.wlog[weekOf(ds)],hs=byDate[ds]||[],done=new Set(hs.map(h=>h.splitId||'')),out=[],seen=new Set();
+    (L?L.items:[]).filter(x=>x.d===dow).forEach(x=>{const k=x.title+'|'+x.s;if(seen.has(k))return;seen.add(k);out.push({...x,lg:x.splits.some(id=>done.has(id))})});
+    [...done].forEach(id=>{if(out.some(x=>x.splits.includes(id)))return;const sp=getSp(id);out.push({title:sp?sp.name||'Split':'Training',col:sp?sp.col:'slate',splits:[id],lg:true,s:-1})});return out};
+  migrateGoals();const gBy={},push=(d,x)=>(gBy[d]=gBy[d]||[]).push(x),AG=allGoals().filter(x=>x.g.status!=='off');AG.forEach(({p,g})=>{if(g.due)push(g.due,{_gd:1,p,g,col:p.col,title:pName(p)+' - '+(g.title||'goal')});g.ms.forEach(m=>{if(m.due)push(m.due,{_ms:1,p,g,m,col:p.col,title:m.t||'Milestone'})})});
   days.forEach(d=>{const ds=ymd(d);AG.forEach(({p,g})=>{if(checkinsIn(g,ds))push(ds,{_ci:1,p,g,col:p.col,title:'Check in: '+(g.title||'goal')})})});
   const mGoals=Object.entries(gBy).filter(([d,xs])=>{const x=ymdP(d);return x.getMonth()===calM.getMonth()&&x.getFullYear()===calM.getFullYear()}).reduce((a,[d,xs])=>a+xs.filter(x=>!x._ci).length,0),mDays=new Set(S.hist.filter(h=>{const d=ymdP(h.date);return d.getMonth()===calM.getMonth()&&d.getFullYear()===calM.getFullYear()}).map(h=>h.date)).size;
   const isCur=calM.getMonth()===new Date().getMonth()&&calM.getFullYear()===new Date().getFullYear();
@@ -3081,26 +3141,27 @@ function renderCal(){const P=$('p-cal');if(!P)return;const today=ymd(new Date())
   <div class="calw"><div class="card calg"><div class="cdow">${DOWS.map(x=>`<span>${x}</span>`).join('')}</div><div class="cgrid">`;
   days.forEach(d=>{const ds=ymd(d),inM=d.getMonth()===calM.getMonth(),hs=byDate[ds]||[],gs=gBy[ds]||[],sps=[...new Set(hs.map(x=>x.splitId||''))],pl=(TT()?TT().blocks:[]).filter(b=>b.wk===weekOf(ds)&&b.d===(d.getDay()+6)%7).reduce((a,b)=>a+b.e-b.s,0);
     h+=`<button class="cc ${inM?'':'out'} ${ds<today?'past':''} ${ds===today?'tod':''} ${ds===calSel?'sel':''}" data-act="calday" data-d="${ds}" aria-label="${esc(d.toDateString())}${hs.length?', trained':''}${gs.length?', '+gs.length+' goal due':''}" aria-pressed="${ds===calSel}"><span class="cn">${d.getDate()}</span>${pl?`<span class="cpl">${hrs(pl)} planned</span>`:''}`+
-      (sps.length?`<span class="cdots">${sps.slice(0,4).map(id=>{const sp=getSp(id);return `<i class="cat" style="${catVars(sp?sp.col:'slate')}"></i>`}).join('')}${hs.length?`<em>${hs.length} ex</em>`:''}</span>`:'')+
-      gs.slice(0,2).map(g=>`<span class="cgl cat ${g._ci?'ci':''}" style="${catVars(g.col)}">${esc(g.title||'Untitled goal')}</span>`).join('')+(gs.length>2?`<span class="cmore">+${gs.length-2} more</span>`:'')+`</button>`});
-  h+=`</div></div><div class="card cald">${dayDetail(calSel,byDate[calSel]||[],gBy[calSel]||[])}</div></div>`;
-  P.innerHTML=h}
-function dayDetail(ds,hs,gs){const d=ymdP(ds),dow=(d.getDay()+6)%7,bl=(TT()?TT().blocks:[]).filter(b=>b.d===dow&&b.wk===weekOf(ds)).sort((a,b)=>a.s-b.s);
+      (()=>{const ex=exOf(ds),ne=Math.min(ex.length,gs.length?2:3),ng=Math.min(gs.length,Math.max(1,3-ne)),more=ex.length-ne+gs.length-ng;
+        return ex.slice(0,ne).map(x=>`<span class="cgl cex cat ${x.lg?'lg':''}" style="${catVars(x.col)}"><i></i>${esc(x.title)}</span>`).join('')+gs.slice(0,ng).map(g=>`<span class="cgl cat ${g._ci?'ci':''}" style="${catVars(g.col)}">${esc(g.title||'Untitled goal')}</span>`).join('')+(more>0?`<span class="cmore">+${more} more</span>`:'')})()+`</button>`});
+  h+=`</div></div><div class="card cald">${dayDetail(calSel,byDate[calSel]||[],gBy[calSel]||[],exOf(calSel))}</div></div>`;
+  still(P,'cal');P.innerHTML=h}
+function dayDetail(ds,hs,gs,ex){ex=ex||[];const d=ymdP(ds),dow=(d.getDay()+6)%7,bl=(TT()?TT().blocks:[]).filter(b=>b.d===dow&&b.wk===weekOf(ds)).sort((a,b)=>a.s-b.s);
   const sess=new Set(hs.map(x=>x.splitId||'')).size,sets=hs.reduce((a,x)=>a+(+x.sets||0),0),sch=bl.reduce((a,b)=>a+b.e-b.s,0),kc=hs.filter(x=>exInfo(x.exId).group==='Cardio').reduce((a,x)=>a+kcalOf(x),0);
   const rel=ds===ymd(new Date())?'Today':ds===ymd(new Date(Date.now()-864e5))?'Yesterday':d.toLocaleDateString(undefined,{weekday:'long'});
   let h=`<div class="cdh"><div class="lab">${esc(rel)}</div><h2>${d.toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'})}</h2></div>
    <div class="ostat4 c2">${[[sess||0,'sessions'],[hs.length,'exercises'],[sets,'sets'],[sch?hrs(sch):'None','scheduled']].map(tileHTML).join('')}</div>`;
-  h+=`<div class="csec"><div class="csh"><span class="lab">Goals</span><button class="lk" data-act="calgoal" data-d="${ds}">${ic('plus')}New project</button></div>`;
-  const gx=x=>{const at=`data-act="calopen" data-id="${x.p.id}" data-g="${x.g.id}"`;if(x._ms){const st=msStat(x.m);return `<button class="cgoal cat" style="${catVars(x.col)}" ${at}><span class="gdot"></span><span class="cgt"><b>${esc(x.m.t||'Milestone')}${x.m.time?' · '+fmtT(x.m.time):''}</b><span class="hint">${esc(x.p.name)} - ${esc(x.g.title)} · ${st[0]}</span></span>${urgPill(x.m.urg)}</button>`}
-    if(x._ci)return `<button class="cgoal cat" style="${catVars(x.col)}" ${at}><span class="gdot"></span><span class="cgt"><b>Check in</b><span class="hint">Review ${esc(x.p.name)} - ${esc(x.g.title)}</span></span></button>`;
-    const pc=gProg(x.g),dl=daysLeft(x.g.due);return `<button class="cgoal cat" style="${catVars(x.col)}" ${at}><span class="gdot"></span><span class="cgt"><b>${esc(x.p.name)} - ${esc(x.g.title)}</b><span class="hint">Goal ends ${dl<0?(-dl)+' days ago':dl===0?'today':'in '+dl+' days'} · ${x.g.ms.filter(m=>m.d).length} of ${x.g.ms.length} milestones</span></span><span class="pbar"><i style="width:${pc}%"></i></span><span class="pct">${pc}%</span></button>`};
-  h+=gs.length?gs.map(g=>{const sp=gx(g);if(sp)return sp;const p=Math.round(gProg(g)),dl=daysLeft(g.due);return `<button class="cgoal cat" style="${catVars(g.col)}" data-act="calopen" data-id="${g.id}"><span class="gdot"></span><span class="cgt"><b>${esc(g.title||'Untitled goal')}</b><span class="hint">${dl<0?(-dl)+' days over':dl===0?'Due today':dl+' day'+(dl===1?'':'s')+' left'}${g.ms.length?` · ${g.ms.filter(m=>m.d).length} of ${g.ms.length} milestones`:''}</span></span><span class="pbar"><i style="width:${p}%"></i></span><span class="pct">${p}%</span></button>`}).join(''):'<p class="hint">Nothing due this day.</p>';
-  h+='</div>';
   h+=`<div class="csec"><span class="lab">Training</span>`;
+  const schx=ex.filter(x=>x.s>=0);if(schx.length)h+=`<div class="cexl">${schx.map(x=>`<div class="cexr cat ${x.lg?'lg':''}" style="${catVars(x.col)}"><i></i><b>${esc(x.title)}</b><span class="mo">${fmt(x.s)} to ${fmt(x.e)}</span><span class="hint">${x.lg?'Logged in Training':'Scheduled'}</span></div>`).join('')}</div>`;
   if(hs.length){const by={};hs.forEach(x=>{const k=x.splitId||'';(by[k]=by[k]||[]).push(x)});
     h+=Object.entries(by).map(([k,xs])=>{const sp=getSp(k);return `<div class="ctr"><div class="ctrh cat" style="${catVars(sp?sp.col:'slate')}"><span class="cdot"></span><b>${esc(sp?sp.name||'Untitled split':'No split')}</b><span class="hint">${xs.length} exercise${xs.length===1?'':'s'}</span></div>${xs.map(x=>`<div class="ctrr"><span>${esc(exInfo(x.exId).name)}</span><span>${specOf(x)}</span></div>`).join('')}</div>`}).join('');
     if(kc)h+=`<p class="hint">About ${Math.round(kc)} kcal burned on cardio, estimated.</p>`}
-  else h+=`<p class="hint">${ds>ymd(new Date())?'Nothing logged yet. Log sessions from Training on the day.':'Nothing logged this day.'}</p>`;
+  else if(!schx.length)h+=`<p class="hint">${ds>ymd(new Date())?'Nothing logged yet. Log sessions from Training on the day.':'Nothing logged this day.'}</p>`;
+  h+='</div>';
+  h+=`<div class="csec"><div class="csh"><span class="lab">Goals</span><button class="lk" data-act="calgoal" data-d="${ds}">${ic('plus')}New project</button></div>`;
+  const gx=x=>{const at=`data-act="calopen" data-id="${x.p.id}" data-g="${x.g.id}"`;if(x._ms){const st=msStat(x.m);return `<button class="cgoal cat" style="${catVars(x.col)}" ${at}><span class="gdot"></span><span class="cgt"><b>${esc(x.m.t||'Milestone')}${x.m.time?' · '+fmtT(x.m.time):''}</b><span class="hint">${esc(pName(x.p))} - ${esc(x.g.title)} · ${st[0]}</span></span>${urgPill(x.m.urg)}</button>`}
+    if(x._ci)return `<button class="cgoal cat" style="${catVars(x.col)}" ${at}><span class="gdot"></span><span class="cgt"><b>Check in</b><span class="hint">Review ${esc(pName(x.p))} - ${esc(x.g.title)}</span></span></button>`;
+    const pc=gProg(x.g),dl=daysLeft(x.g.due);return `<button class="cgoal cat" style="${catVars(x.col)}" ${at}><span class="gdot"></span><span class="cgt"><b>${esc(pName(x.p))} - ${esc(x.g.title)}</b><span class="hint">Goal ends ${dl<0?(-dl)+' days ago':dl===0?'today':'in '+dl+' days'} · ${x.g.ms.filter(m=>m.d).length} of ${x.g.ms.length} milestones</span></span><span class="pbar"><i style="width:${pc}%"></i></span><span class="pct">${pc}%</span></button>`};
+  h+=gs.length?gs.map(g=>{const sp=gx(g);if(sp)return sp;const p=Math.round(gProg(g)),dl=daysLeft(g.due);return `<button class="cgoal cat" style="${catVars(g.col)}" data-act="calopen" data-id="${g.id}"><span class="gdot"></span><span class="cgt"><b>${esc(g.title||'Untitled goal')}</b><span class="hint">${dl<0?(-dl)+' days over':dl===0?'Due today':dl+' day'+(dl===1?'':'s')+' left'}${g.ms.length?` · ${g.ms.filter(m=>m.d).length} of ${g.ms.length} milestones`:''}</span></span><span class="pbar"><i style="width:${p}%"></i></span><span class="pct">${p}%</span></button>`}).join(''):'<p class="hint">Nothing due this day.</p>';
   h+='</div>';
   h+=`<div class="csec"><span class="lab">Schedule</span>${bl.length?bl.map(b=>{const c=getC(b.cat);return `<div class="csch cat" style="${catVars(colOf(b))}"><span class="ctime">${fmt(b.s)}–${fmt(b.e)}</span><span class="cbar"></span><span class="cst"><b>${esc(b.title||'Untitled')}</b>${c||b.loc?`<span class="hint">${[c?esc(c.name):'',b.loc?esc(b.loc):''].filter(Boolean).join(' · ')}</span>`:''}</span></div>`}).join(''):`<p class="hint">${ds>ymd(new Date())?'No plans yet for this day.':ds===ymd(new Date())?'Nothing scheduled today.':'Nothing was scheduled.'}</p>`}</div>`;
   return h}
@@ -3108,7 +3169,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(
   if(a==='calm'){const dir=+t.dataset.d;calM=new Date(calM.getFullYear(),calM.getMonth()+dir,1);renderCal();const g=document.querySelector('#p-cal .cgrid'),m=$('calmon');if(motionOK()){g&&g.animate&&g.animate([{transform:`translateX(${dir*48}px)`,opacity:0},{transform:'none',opacity:1}],{duration:280,easing:'cubic-bezier(.2,.8,.2,1)'});m&&m.animate&&m.animate([{transform:`translateX(${dir*14}px)`,opacity:0},{transform:'none',opacity:1}],{duration:240,easing:'ease-out'})}}
   else if(a==='caltoday'){calSel=ymd(new Date());calM=null;renderCal()}
   else if(a==='calday'){calSel=t.dataset.d;const d=ymdP(calSel);if(d.getMonth()!==calM.getMonth()||d.getFullYear()!==calM.getFullYear())calM=new Date(d.getFullYear(),d.getMonth(),1);renderCal()}
-  else if(a==='calgoal'){gPreDue=t.dataset.d;gName='';gv='name';renderGoals();go(3);setTimeout(()=>{const f=$('g-name');f&&f.focus()},420)}
+  else if(a==='calgoal'){gPreDue=t.dataset.d;gName='';gPDesc='';gTags=[];gColP=nextCol(S.projects.map(x=>x.col));gv='name';renderGoals();go(3);setTimeout(()=>{const f=$('g-name');f&&f.focus()},420)}
   else if(a==='calopen'){pOpen=t.dataset.id;gSel=t.dataset.g||null;gAdd=null;gv='goal';renderGoals();go(3);const P=$('p-goals');P&&(P.scrollTop=0)}});
 
 /* ---------- boot ---------- */
