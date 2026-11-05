@@ -1549,16 +1549,8 @@ button.spsh:hover{background:var(--sunk)}
 .gnrow .gni{flex:1;min-width:0;border-bottom:0}
 @media (max-width:760px){.gnpre{font-size:24px}}
 .gfrow{display:flex;flex-direction:column;gap:8px}
-.gtagbox{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:42px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:text}
-.gtagbox:focus-within{border-color:var(--ink)}
-.gtagin{flex:1;min-width:140px;border:0;outline:0;background:none;font:inherit;font-size:14px;color:var(--ink);padding:4px 2px}
 .gptags{display:flex;flex-wrap:wrap;gap:6px}
 .gptags.big{margin-top:2px}
-.gptag{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);font-size:12.5px;color:var(--ink);white-space:nowrap}
-.gptag.ed{padding-right:3px}
-.gtagx{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:var(--muted)}
-.gtagx:hover{background:var(--line);color:var(--ink)}
-.gtagx svg{width:11px;height:11px}
 .gsw{display:flex;flex-wrap:wrap;gap:8px}
 .gsw .pd{width:26px;height:26px;transition:transform .12s}
 .gsw .pd:hover{transform:scale(1.08)}
@@ -1579,6 +1571,42 @@ button.spsh:hover{background:var(--sunk)}
 @media (max-width:760px){.cgl.cex{font-size:0;height:auto;padding:0}.cgl.cex i{width:6px;height:6px}.logwk .lbl{display:none}}
 
 .still,.still *{animation:none!important}
+
+.ccaps{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0;width:100%}
+.ccap{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-width:0;padding:1px 8px 1px 6px;border-radius:999px;background:color-mix(in srgb,var(--s) 18%,transparent);color:var(--t);font-size:11px;font-weight:500;line-height:17px;white-space:nowrap}
+.ccap>svg{width:12px;height:12px;flex:none;stroke-width:2}
+.ccap .cct{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.ccap .cck{display:inline-flex;margin-left:1px}.ccap .cck svg{width:11px;height:11px;stroke-width:2.6}
+.ccap.ci{opacity:.8}
+.cc.past .ccap{opacity:.6}
+@media (max-width:760px){.ccaps{gap:2px}.ccap{width:100%;height:5px;padding:0;font-size:0;background:var(--s);border-radius:3px}.ccap>svg,.ccap .cck{display:none}}
+
+.gtc{display:inline-flex;align-items:center;gap:2px;height:28px;padding:0 4px 0 11px;border-radius:999px;background:color-mix(in srgb,var(--s) 18%,transparent);color:var(--t);font-size:13px;font-weight:500;white-space:nowrap;user-select:none;-webkit-user-select:none;touch-action:none;cursor:grab;transition:transform .12s,box-shadow .12s,opacity .12s;max-width:100%}
+.gptags .gtc{height:24px;padding:0 10px;font-size:12px;cursor:default;touch-action:auto}
+.gtc .gtn{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.gtc:hover{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--s) 55%,transparent)}
+.gtc:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.gtcx{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:inherit;opacity:.55;flex:none}
+.gtcx:hover{opacity:1;background:color-mix(in srgb,var(--s) 25%,transparent)}
+.gtcx svg{width:12px;height:12px}
+.gtz{display:flex;flex-wrap:wrap;align-items:center;gap:7px;min-height:52px;padding:11px 12px;border:1.5px dashed var(--line);border-radius:12px;transition:border-color .15s,background .15s}
+.gtz.over{border-color:var(--ink);background:var(--sunk)}
+.gtzph{font-size:13px;color:var(--faint)}
+.gtray{margin-top:10px;padding:12px;border-radius:12px;background:var(--sunk);display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s}
+.gtray.over{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.gtrh{display:flex;align-items:center;gap:8px}
+.gtrl{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.gtrc{display:flex;flex-wrap:wrap;gap:7px}
+.gtray .gtc{background:color-mix(in srgb,var(--s) 22%,var(--surface))}
+.gted{display:flex;flex-direction:column;gap:12px;padding:12px;border-radius:10px;background:var(--surface);border:1px solid var(--line);animation:fadeq .2s ease-out}
+.gtedr{display:flex;align-items:center;gap:10px}.gtedr .inp{flex:1;min-width:0}
+.gtc.gtprev{cursor:default;padding:0 12px;flex:none;max-width:45%}
+.gtedf{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn.sm{height:30px;font-size:12.5px;padding:0 10px}
+.gtghost{position:fixed;z-index:80;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.18);transform:rotate(-2deg) scale(1.05);margin:0}
+.gtsrc{opacity:.3}
+.gtmark{width:3px;height:24px;border-radius:2px;background:var(--ink);flex:none}
+body.gtdragging,body.gtdragging *{cursor:grabbing!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1725,6 +1753,7 @@ function seedExtras(o){
   ['splits','hist','exlib'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[]});
   if(!Array.isArray(o.goals))o.goals=[];
   if(!Array.isArray(o.projects))o.projects=[];
+  if(!Array.isArray(o.ptags))o.ptags=[];
   if(!o.wlog||typeof o.wlog!=='object')o.wlog={};
   if(!Array.isArray(o.quotes))o.quotes=[];
   if(!o.profile||typeof o.profile!=='object')o.profile={sex:'',age:'',h:'',w:o.set&&+o.set.bw?+o.set.bw:'',std:'who'};
@@ -1771,7 +1800,7 @@ const hrs=(m)=>{const h=m/60;return (Math.round(h*10)/10).toString().replace(/\.
 const toHM=(m)=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 const fromHM=(v)=>{const p=/^(\d{1,2}):(\d{2})$/.exec(v||'');return p?(+p[1])*60+(+p[2]):null};
 
-const UK=['cats','tts','active','splits','hist','exlib','goals','quotes','profile','body','projects','wlog'];
+const UK=['cats','tts','active','splits','hist','exlib','goals','quotes','profile','body','projects','wlog','ptags'];
 function snap(){const o={};UK.forEach(k=>o[k]=S[k]);return JSON.stringify(o)}
 function pushUndo(){U.push(snap());if(U.length>80)U.shift();R.length=0}
 function restore(str){const o=JSON.parse(str);UK.forEach(k=>S[k]=o[k]);if(sel&&!getB(sel))sel=null;[...msel].forEach(id=>{if(!getB(id))msel.delete(id)})}
@@ -2667,7 +2696,9 @@ function normMs(m){return {id:m.id||uid(),t:m.t||'',desc:m.desc||m.note||'',due:
 function normGoal(g){g.title=g.title||'';g.desc=g.desc||'';g.start=g.start||todayS();g.due=g.due||'';g.status=GSTAT[g.status]?g.status:'on';g.sort=g.sort||'due';
   g.ms=(g.ms||[]).map(normMs);g.checkin=g.checkin||{freq:'off',day:6};g.log=Array.isArray(g.log)?g.log:[];g.phases=[];return g}
 function normProj(p){p.name=p.name||'';p.desc=p.desc||'';p.col=p.col||'blue';p.tags=Array.isArray(p.tags)?p.tags:[];p.goals=(p.goals||[]).map(normGoal);p.goals.forEach(g=>g.col=p.col);return p}
-function migrateGoals(){if(!Array.isArray(S.projects))S.projects=[];
+function migTags(){if(!Array.isArray(S.ptags))S.ptags=[];S.projects.forEach(p=>{if(!Array.isArray(p.tags)){p.tags=[];return}p.tags=p.tags.map(t=>{if(typeof t!=='string'||S.ptags.some(x=>x.id===t))return t;let x=S.ptags.find(y=>y.name.toLowerCase()===t.toLowerCase());if(!x){x={id:uid(),name:t,col:nextCol(S.ptags.map(y=>y.col))};S.ptags.push(x)}return x.id}).filter(id=>S.ptags.some(x=>x.id===id))})}
+const getT=id=>S.ptags.find(x=>x.id===id);
+function migrateGoals(){if(!Array.isArray(S.projects))S.projects=[];migTags();
   if(Array.isArray(S.goals)&&S.goals.length){S.goals.forEach(o=>{S.projects.push(normProj({id:uid(),name:o.title||'Untitled project',desc:o.desc||o.why||'',col:o.col||'blue',goals:[{id:o.id||uid(),title:o.title||'Main goal',desc:o.why||o.desc||'',start:o.start||todayS(),due:o.due||'',status:o.status==='paused'?'off':o.status==='planning'?'notyet':'on',ms:o.ms||[],checkin:o.checkin,log:o.log}]}))});S.goals=[];save()}
   S.projects.forEach(normProj)}
 const getP=id=>S.projects.find(p=>p.id===id);
@@ -2691,7 +2722,7 @@ function checkinsIn(g,ds){const c=g.checkin;if(!c||c.freq==='off'||g.status==='o
 const shortDY=ds=>ymdP(ds).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
 const fmtT=t=>{if(!t)return '';const [h,m]=t.split(':').map(Number);return fmt(h*60+m)};
 const pName=p=>{const n=((p&&p.name)||'').trim();return !n?'Untitled project':/^project\b/i.test(n)?n:'Project '+n};
-const pTags=(p,cls)=>p.tags&&p.tags.length?`<div class="gptags ${cls||''}">${p.tags.map(t=>`<span class="gptag">${esc(t)}</span>`).join('')}</div>`:'';
+const pTags=(p,cls)=>{const T=(p.tags||[]).map(getT).filter(Boolean);return T.length?`<div class="gptags ${cls||''}">${T.map(t=>`<span class="gtc cat" style="${catVars(t.col)}">${esc(t.name)}</span>`).join('')}</div>`:''};
 const dispName=(p,g)=>`${esc(pName(p))}<span class="gsep">-</span>${esc(g.title||'Untitled goal')}`;
 function goalChart(g,W,H){W=W||640;H=H||240;const [x0,x1]=gRange(g),{proj,act}=gLines(g),pl=42,pr=16,pt=22,pb=34,span=dBetween(x0,x1)||1;
   const X=ds=>pl+Math.max(0,Math.min(1,dBetween(x0,ds)/span))*(W-pl-pr),Y=v=>pt+(1-v)*(H-pt-pb);let s=`<svg viewBox="0 0 ${W} ${H}" class="chart gchart" role="img" aria-label="Projected and actual progress">`;
@@ -2728,13 +2759,26 @@ function projForm(){const ed=gv==='pedit',p=ed?getP(pOpen):null;
   <div class="card gname"><span class="lab">${ed?'Edit project':'New project'}</span>
    <div class="gnrow"><span class="gnpre">Project</span><input class="gni" id="g-name" data-f="gname" value="${esc(gName.replace(/^project\s+/i,''))}" placeholder="name, like ABC" autocomplete="off" aria-label="Project name"></div>
    <textarea class="inp gpdin" id="g-pdesc" data-f="gpdesc" rows="4" placeholder="Describe the project. What is it about, and why does it matter to you?" aria-label="Project description">${esc(gPDesc)}</textarea>
-   <div class="gfrow"><span class="lab">Tags</span><div class="gtagbox" id="g-tags">${gTagBox()}</div></div>
+   <div class="gfrow"><span class="lab">Tags</span><div id="g-tagarea">${gTagArea()}</div></div>
    <div class="gfrow"><span class="lab">Colour</span><div class="gsw" role="radiogroup" aria-label="Project colour">${PKEYS.map(k=>`<button class="pd cat ${k===gColP?'on':''}" style="${catVars(k)}" data-act="g_pcol" data-k="${k}" role="radio" aria-checked="${k===gColP}" aria-label="${cap(k)}" title="${cap(k)}"></button>`).join('')}</div></div>
    <p class="err" id="g-name-err" hidden>Give your project a name first.</p>
    <div class="gnf">${ed?`<span class="hint">Goals aren't affected.</span>`:`<span class="hint">You'll add goals after creating the project.</span>`}<span class="sp"></span>${ed?`<button class="btn" data-act="${gFrom==='goal'?'g_back':'g_home'}">Cancel</button>`:''}<button class="btn pri" data-act="g_start">${ed?ic('check')+'Save':ic('plus')+'Create project'}</button></div></div>`}
 let gFrom='home',gPDesc='',gTags=[],gColP='blue';
-function gTagBox(){return gTags.map((t,i)=>`<span class="gptag ed">${esc(t)}<button class="gtagx" data-act="g_tagdel" data-i="${i}" aria-label="Remove ${esc(t)}">${ic('x')}</button></span>`).join('')+`<input class="gtagin" id="g-tagin" placeholder="${gTags.length?'Add tag':'Type a tag and press Enter'}" autocomplete="off" aria-label="Add tag">`}
-function gTagAdd(v){v=(v||'').trim().replace(/,$/,'').trim();if(v&&!gTags.some(x=>x.toLowerCase()===v.toLowerCase()))gTags.push(v.slice(0,30));const b=$('g-tags');if(b){b.innerHTML=gTagBox();const i=$('g-tagin');i&&i.focus()}}
+let gTagEd=null,tDrag=null,tSupClick=0;
+function gChip(t,w){return `<span class="gtc cat ${w}" style="${catVars(t.col)}" data-tid="${t.id}" data-w="${w}" data-act="g_tclick" tabindex="0" role="button" aria-label="${w==='in'?'Remove':'Add'} tag ${esc(t.name)}" title="${w==='in'?'Drag to reorder, or drag back to remove':'Click or drag up to add'}"><span class="gtn">${esc(t.name)}</span>${w==='in'?`<button class="gtcx" data-act="g_tout" data-tid="${t.id}" aria-label="Remove ${esc(t.name)}">${ic('x')}</button>`:`<button class="gtcx" data-act="g_tedit" data-tid="${t.id}" aria-label="Edit ${esc(t.name)}" title="Rename, recolour or delete">${ic('edit')}</button>`}</span>`}
+function gTagArea(){const IN=gTags.map(getT).filter(Boolean),OUT=S.ptags.filter(t=>!gTags.includes(t.id)),E=gTagEd;
+  return `<div class="gtz" data-drop="in">${IN.length?IN.map(t=>gChip(t,'in')).join(''):`<span class="gtzph">Drop tags here, or click one below</span>`}</div>
+  <div class="gtray" data-drop="tray"><div class="gtrh"><span class="gtrl">Your tags</span><span class="sp"></span>${E?'':`<button class="btn sm" data-act="g_tnew">${ic('plus')}Create tag</button>`}</div>
+   ${OUT.length?`<div class="gtrc">${OUT.map(t=>gChip(t,'tray')).join('')}</div>`:(E?'':`<p class="hint">${S.ptags.length?'All your tags are on this project.':'No tags yet. Create one to start.'}</p>`)}
+   ${E?`<div class="gted"><div class="gtedr"><span class="gtc cat gtprev" style="${catVars(E.col)}" id="g-tprev">${esc(E.name||'Tag name')}</span><input class="inp" id="g-tname" value="${esc(E.name)}" placeholder="Tag name" maxlength="30" autocomplete="off" aria-label="Tag name"></div>
+     <div class="gsw">${PKEYS.map(k=>`<button class="pd cat ${k===E.col?'on':''}" style="${catVars(k)}" data-act="g_tcol" data-k="${k}" aria-label="${cap(k)}" title="${cap(k)}"></button>`).join('')}</div>
+     <div class="gtedf">${E.id?`<button class="btn dan" data-act="g_tdel">${ic('trash')}Delete tag</button>`:''}<span class="sp"></span><button class="btn" data-act="g_tcancel">Cancel</button><button class="btn pri" data-act="g_tsave">${ic('check')}${E.id?'Save':'Create tag'}</button></div></div>`:''}
+  </div>`}
+function gTagRender(focusName){const a=$('g-tagarea');if(!a)return;a.innerHTML=gTagArea();if(focusName){const f=$('g-tname');if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length)}}}
+function gTagSave(){const E=gTagEd;if(!E)return;const nm=(($('g-tname')||{}).value||E.name||'').trim();if(!nm){const f=$('g-tname');f&&f.focus();return}
+  if(E.id){const t=getT(E.id);if(t){pushUndo();t.name=nm;t.col=E.col;save()}}else{const dup=S.ptags.find(x=>x.name.toLowerCase()===nm.toLowerCase());if(dup){if(!gTags.includes(dup.id))gTags.push(dup.id)}else{pushUndo();const t={id:uid(),name:nm.slice(0,30),col:E.col};S.ptags.push(t);save();gTags.push(t.id)}}
+  gTagEd=null;gTagRender()}
+function gTagMove(id,toIn,idx){const k=gTags.indexOf(id);if(k>=0)gTags.splice(k,1);if(toIn){if(idx==null||idx>gTags.length)idx=gTags.length;else if(k>=0&&k<idx)idx--;gTags.splice(Math.max(0,idx),0,id)}gTagRender()}
 function msForm(m,isNew){return `<div class="gmsc gmsform"><div class="gmsh"><input class="inp gmsn" id="ms-t" data-f="msd" data-k="t" value="${esc(m.t)}" placeholder="Milestone name" aria-label="Milestone name" autocomplete="off"><input class="inpd" type="date" data-f="msd" data-k="due" value="${m.due}" aria-label="Date"><input class="inpd gtime" type="time" data-f="msd" data-k="time" value="${m.time}" aria-label="Time, optional" title="Time, optional"></div>
    <textarea class="inp" rows="2" data-f="msd" data-k="desc" placeholder="What does this milestone involve? (optional)">${esc(m.desc)}</textarea>
    <div class="gmsf2"><div class="gfld"><span class="k">Urgency</span>${urgPick(m.urg,'g_msurg')}</div><span class="sp"></span><button class="btn" data-act="g_mscancel">Cancel</button><button class="btn pri" data-act="g_msok">${ic('check')}${isNew?'Add':'Save'}</button></div><p class="err" id="ms-err" hidden>Give the milestone a name.</p></div>`}
@@ -2785,7 +2829,7 @@ function renderGoals(){qShownAt=Date.now();const P=$('p-goals');if(!P)return;mig
   P.innerHTML=`<div class="gvw gv-${gv}">${gv==='home'?projHome():gv==='name'||gv==='pedit'?projForm():gv==='gedit'?goalEdit():projPage()}</div>`;fitQuote()}
 function gGo(v,keepScroll){gv=v;renderGoals();if(!keepScroll){const P=$('p-goals');P&&(P.scrollTop=0)}if(v==='name'||v==='pedit')setTimeout(()=>{const f=$('g-name');if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length)}},40)}
 const focusSel=sel=>setTimeout(()=>{const f=document.querySelector(sel);if(f){f.focus();f.scrollIntoView({block:'center',behavior:motionOK()?'smooth':'auto'})}},40);
-function gStart(){const ti=$('g-tagin');if(ti&&ti.value.trim())gTagAdd(ti.value);const nm=(gName||'').trim().replace(/^project\s+/i,'');if(!nm){const e=$('g-name-err');e&&(e.hidden=false);$('g-name')&&$('g-name').focus();return}
+function gStart(){gTagEd=null;const nm=(gName||'').trim().replace(/^project\s+/i,'');if(!nm){const e=$('g-name-err');e&&(e.hidden=false);$('g-name')&&$('g-name').focus();return}
   if(gv==='pedit'){const p=getP(pOpen);if(p){pushUndo();p.name=nm;p.desc=gPDesc.trim();p.tags=gTags.slice();p.col=gColP;p.goals.forEach(g=>g.col=gColP);save();toast('Project updated')}gName='';gPDesc='';gGo(gFrom==='goal'?'goal':'home');return}
   pushUndo();const p=normProj({id:uid(),name:nm,desc:gPDesc.trim(),tags:gTags.slice(),col:gColP,goals:[]});S.projects.push(p);save();pOpen=p.id;gSel=null;gName='';gPDesc='';gGo('goal');toast(`${pName(p)} created`)}
 function curGoal(){const p=getP(pOpen);return p&&p.goals.find(g=>g.id===gSel)}
@@ -2801,7 +2845,14 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(
   case 'g_back':gGo('goal');break;
   case 'g_new':gName='';gPDesc='';gTags=[];gColP=nextCol(S.projects.map(x=>x.col));gFrom='home';gGo('name');break;
   case 'g_pcol':{gColP=t.dataset.k;document.querySelectorAll('[data-act=g_pcol]').forEach(b=>{const on=b===t;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)});break}
-  case 'g_tagdel':{gTags.splice(+t.dataset.i,1);gTagAdd('');break}
+  case 'g_tclick':{if(Date.now()-tSupClick<350)break;const id=t.dataset.tid;gTagMove(id,t.dataset.w!=='in');break}
+  case 'g_tout':{e.stopPropagation();gTagMove(t.dataset.tid,false);break}
+  case 'g_tedit':{e.stopPropagation();const x=getT(t.dataset.tid);if(!x)break;gTagEd={id:x.id,name:x.name,col:x.col};gTagRender(true);break}
+  case 'g_tnew':gTagEd={id:null,name:'',col:nextCol(S.ptags.map(x=>x.col))};gTagRender(true);break;
+  case 'g_tcol':{const f=$('g-tname');if(f)gTagEd.name=f.value;gTagEd.col=t.dataset.k;document.querySelectorAll('[data-act=g_tcol]').forEach(b=>b.classList.toggle('on',b===t));const pv=$('g-tprev');if(pv)pv.setAttribute('style',catVars(t.dataset.k));const nf=$('g-tname');if(nf)nf.focus();break}
+  case 'g_tcancel':gTagEd=null;gTagRender();break;
+  case 'g_tsave':gTagSave();break;
+  case 'g_tdel':{if(!armed(t,ic('check')+'Tap again to delete'))break;const id=gTagEd.id;pushUndo();S.ptags=S.ptags.filter(x=>x.id!==id);S.projects.forEach(p=>p.tags=(p.tags||[]).filter(x=>x!==id));gTags=gTags.filter(x=>x!==id);save();gTagEd=null;gTagRender();toast('Tag deleted');break}
   case 'g_start':gStart();break;
   case 'g_open':if(e.target.closest('.grip,.gpen'))break;pOpen=t.dataset.id;gSel=null;gmsOpen.clear();gGo('goal');break;
   case 'g_pedit':{e.stopPropagation();const p=getP(t.dataset.id);if(!p)break;gFrom=gv==='goal'?'goal':'home';pOpen=p.id;gName=p.name;gPDesc=p.desc;gTags=(p.tags||[]).slice();gColP=p.col;gGo('pedit');break}
@@ -2846,8 +2897,19 @@ document.addEventListener('change',e=>{const t=e.target,f=t.dataset&&t.dataset.f
   else if(f==='msd'&&msDraft&&t.type!=='text'&&t.tagName==='INPUT'&&(t.dataset.k==='due'||t.dataset.k==='time'))msDraft[t.dataset.k]=t.value
   else if(f==='gcid'&&gDraft)gDraft.checkin.day=+t.value});
 let qEditStart=false;
-document.addEventListener('mousedown',e=>{const b=e.target.closest&&e.target.closest('.gtagbox');if(!b||e.target.closest('button,input'))return;e.preventDefault();const i=$('g-tagin');i&&i.focus()});
-document.addEventListener('keydown',e=>{const t=e.target;if(!t||t.id!=='g-tagin')return;if(e.key==='Enter'||e.key===','){e.preventDefault();e.stopPropagation();if(t.value.trim())gTagAdd(t.value);else if(e.key==='Enter')gStart()}else if(e.key==='Backspace'&&!t.value&&gTags.length){e.preventDefault();gTags.pop();gTagAdd('')}},true);
+document.addEventListener('keydown',e=>{const t=e.target;if(!t)return;if(t.id==='g-tname'){if(e.key==='Enter'){e.preventDefault();e.stopPropagation();gTagSave()}else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();gTagEd=null;gTagRender()}return}
+  if(t.classList&&t.classList.contains('gtc')&&(e.key==='Enter'||e.key===' ')&&t.dataset.tid){e.preventDefault();gTagMove(t.dataset.tid,t.dataset.w!=='in')}},true);
+document.addEventListener('input',e=>{if(e.target.id==='g-tname'&&gTagEd){gTagEd.name=e.target.value;const pv=$('g-tprev');if(pv)pv.textContent=e.target.value||'Tag name'}});
+document.addEventListener('pointerdown',e=>{const c=e.target.closest&&e.target.closest('#g-tagarea .gtc[data-tid]');if(!c||e.button>0||e.target.closest('button'))return;tDrag={c,id:c.dataset.tid,w:c.dataset.w,x0:e.clientX,y0:e.clientY,on:false,pid:e.pointerId}});
+document.addEventListener('pointermove',e=>{const d=tDrag;if(!d||e.pointerId!==d.pid)return;if(!d.on){if(Math.hypot(e.clientX-d.x0,e.clientY-d.y0)<5)return;d.on=true;const z=ZF(),r=d.c.getBoundingClientRect(),g=d.c.cloneNode(true);g.classList.add('gtghost');g.removeAttribute('id');document.body.appendChild(g);d.g=g;d.dx=(e.clientX-r.left)/z;d.dy=(e.clientY-r.top)/z;d.c.classList.add('gtsrc');document.body.classList.add('gtdragging');
+    d.mk=document.createElement('span');d.mk.className='gtmark'}
+  e.preventDefault();const z=ZF();d.g.style.left=(e.clientX/z-d.dx)+'px';d.g.style.top=(e.clientY/z-d.dy)+'px';
+  const el=document.elementFromPoint(e.clientX,e.clientY),zone=el&&el.closest('#g-tagarea [data-drop]');document.querySelectorAll('#g-tagarea [data-drop]').forEach(x=>x.classList.toggle('over',x===zone));d.zone=zone?zone.dataset.drop:null;
+  if(d.zone==='in'){const tz=zone,ch=[...tz.querySelectorAll('.gtc:not(.gtsrc)')];let idx=ch.length,ref=null;for(let i=0;i<ch.length;i++){const r=ch[i].getBoundingClientRect();if(e.clientY<r.bottom&&(e.clientX<r.left+r.width/2||e.clientY<r.top)){idx=i;ref=ch[i];break}}
+    d.idx=idx;const ph=tz.querySelector('.gtzph');if(ph)ph.hidden=true;if(ref)tz.insertBefore(d.mk,ref);else tz.appendChild(d.mk)}else if(d.mk.parentNode)d.mk.remove()},{passive:false});
+function tDragEnd(e){const d=tDrag;tDrag=null;if(!d||!d.on)return;tSupClick=Date.now();d.g.remove();d.mk.remove();document.body.classList.remove('gtdragging');document.querySelectorAll('#g-tagarea [data-drop]').forEach(x=>x.classList.remove('over'));
+  if(d.zone==='in'){const ids=gTags.filter(x=>x!==d.id);let idx=Math.min(d.idx,ids.length);gTags=ids;gTags.splice(idx,0,d.id);gTagRender()}else if(d.zone==='tray'&&d.w==='in')gTagMove(d.id,false);else{d.c.classList.remove('gtsrc');const ph=document.querySelector('#g-tagarea .gtzph');if(ph)ph.hidden=false}}
+document.addEventListener('pointerup',tDragEnd);document.addEventListener('pointercancel',tDragEnd);
 document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.qok'))e.preventDefault()},true);
 function caretAt(el,n){try{const r=document.createRange(),tn=el.firstChild;if(!tn){el.focus();return}r.setStart(tn,Math.min(n,tn.length));r.collapse(true);const sl=getSelection();sl.removeAllRanges();sl.addRange(r)}catch(e){}}
 document.addEventListener('focusin',e=>{const f=e.target.dataset&&e.target.dataset.f;if(f!=='qtx'&&f!=='qby')return;if(qEditStart){qEditStart=false;return}pushUndo()});
@@ -3142,7 +3204,7 @@ function renderCal(){const P=$('p-cal');if(!P)return;const today=ymd(new Date())
   days.forEach(d=>{const ds=ymd(d),inM=d.getMonth()===calM.getMonth(),hs=byDate[ds]||[],gs=gBy[ds]||[],sps=[...new Set(hs.map(x=>x.splitId||''))],pl=(TT()?TT().blocks:[]).filter(b=>b.wk===weekOf(ds)&&b.d===(d.getDay()+6)%7).reduce((a,b)=>a+b.e-b.s,0);
     h+=`<button class="cc ${inM?'':'out'} ${ds<today?'past':''} ${ds===today?'tod':''} ${ds===calSel?'sel':''}" data-act="calday" data-d="${ds}" aria-label="${esc(d.toDateString())}${hs.length?', trained':''}${gs.length?', '+gs.length+' goal due':''}" aria-pressed="${ds===calSel}"><span class="cn">${d.getDate()}</span>${pl?`<span class="cpl">${hrs(pl)} planned</span>`:''}`+
       (()=>{const ex=exOf(ds),ne=Math.min(ex.length,gs.length?2:3),ng=Math.min(gs.length,Math.max(1,3-ne)),more=ex.length-ne+gs.length-ng;
-        return ex.slice(0,ne).map(x=>`<span class="cgl cex cat ${x.lg?'lg':''}" style="${catVars(x.col)}"><i></i>${esc(x.title)}</span>`).join('')+gs.slice(0,ng).map(g=>`<span class="cgl cat ${g._ci?'ci':''}" style="${catVars(g.col)}">${esc(g.title||'Untitled goal')}</span>`).join('')+(more>0?`<span class="cmore">+${more} more</span>`:'')})()+`</button>`});
+        return `<span class="ccaps">`+ex.slice(0,ne).map(x=>`<span class="ccap cat" style="${catVars(x.col)}" title="${esc(x.title)}${x.lg?', logged in Training':''}">${ic('dumbbell')}<span class="cct">${esc(x.title)}</span>${x.lg?`<span class="cck">${ic('check')}</span>`:''}</span>`).join('')+gs.slice(0,ng).map(g=>`<span class="ccap cat ${g._ci?'ci':''}" style="${catVars(g.col)}" title="${esc(g.title||'')}">${ic(g._ms?'pin':g._ci?'calendar':'target')}<span class="cct">${esc(g._ms?g.title:g._ci?'Check in':g.title||'Untitled goal')}</span></span>`).join('')+(more>0?`<span class="cmore">+${more} more</span>`:'')+`</span>`})()+`</button>`});
   h+=`</div></div><div class="card cald">${dayDetail(calSel,byDate[calSel]||[],gBy[calSel]||[],exOf(calSel))}</div></div>`;
   still(P,'cal');P.innerHTML=h}
 function dayDetail(ds,hs,gs,ex){ex=ex||[];const d=ymdP(ds),dow=(d.getDay()+6)%7,bl=(TT()?TT().blocks:[]).filter(b=>b.d===dow&&b.wk===weekOf(ds)).sort((a,b)=>a.s-b.s);
