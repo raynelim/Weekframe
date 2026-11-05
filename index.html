@@ -1579,7 +1579,7 @@ button.spsh:hover{background:var(--sunk)}
 .ccap .cck{display:inline-flex;margin-left:1px}.ccap .cck svg{width:11px;height:11px;stroke-width:2.6}
 .ccap.ci{opacity:.8}
 .cc.past .ccap{opacity:.6}
-@media (max-width:760px){.ccaps{gap:2px}.ccap{width:100%;height:5px;padding:0;font-size:0;background:var(--s);border-radius:3px}.ccap>svg,.ccap .cck{display:none}}
+@media (max-width:760px){.ccaps{gap:2px}.ccap{width:100%;height:5px;padding:0;font-size:0;background:var(--s);border-radius:3px}.ccap>svg,.ccap .cck,.ccap .ccd{display:none}}
 
 .gtc{display:inline-flex;align-items:center;gap:2px;height:28px;padding:0 4px 0 11px;border-radius:999px;background:color-mix(in srgb,var(--s) 18%,transparent);color:var(--t);font-size:13px;font-weight:500;white-space:nowrap;user-select:none;-webkit-user-select:none;touch-action:none;cursor:grab;transition:transform .12s,box-shadow .12s,opacity .12s;max-width:100%}
 .gptags .gtc{height:24px;padding:0 10px;font-size:12px;cursor:default;touch-action:auto}
@@ -1607,6 +1607,13 @@ button.spsh:hover{background:var(--sunk)}
 .gtsrc{opacity:.3}
 .gtmark{width:3px;height:24px;border-radius:2px;background:var(--ink);flex:none}
 body.gtdragging,body.gtdragging *{cursor:grabbing!important}
+
+.gchart .gaxis{stroke:var(--line);stroke-width:1}
+.gchart .gmsg{stroke:var(--s);stroke-width:1;stroke-dasharray:2 3;opacity:.45}
+
+.ccd{width:9px;height:9px;border-radius:50%;flex:none;box-sizing:border-box;border:2px solid var(--s);background:var(--surface)}
+.ccd.on{background:var(--s)}
+.ctrh .ccd{width:11px;height:11px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -2724,14 +2731,18 @@ const fmtT=t=>{if(!t)return '';const [h,m]=t.split(':').map(Number);return fmt(h
 const pName=p=>{const n=((p&&p.name)||'').trim();return !n?'Untitled project':/^project\b/i.test(n)?n:'Project '+n};
 const pTags=(p,cls)=>{const T=(p.tags||[]).map(getT).filter(Boolean);return T.length?`<div class="gptags ${cls||''}">${T.map(t=>`<span class="gtc cat" style="${catVars(t.col)}">${esc(t.name)}</span>`).join('')}</div>`:''};
 const dispName=(p,g)=>`${esc(pName(p))}<span class="gsep">-</span>${esc(g.title||'Untitled goal')}`;
-function goalChart(g,W,H){W=W||640;H=H||240;const [x0,x1]=gRange(g),{proj,act}=gLines(g),pl=42,pr=16,pt=22,pb=34,span=dBetween(x0,x1)||1;
+function goalChart(g,W,H){W=W||640;H=H||240;const [x0,x1]=gRange(g),{proj,act}=gLines(g),pl=42,pr=22,pt=14,pb=42,span=dBetween(x0,x1)||1;
   const X=ds=>pl+Math.max(0,Math.min(1,dBetween(x0,ds)/span))*(W-pl-pr),Y=v=>pt+(1-v)*(H-pt-pb);let s=`<svg viewBox="0 0 ${W} ${H}" class="chart gchart" role="img" aria-label="Projected and actual progress">`;
   [0,.5,1].forEach(v=>{s+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}" class="cg"/><text x="${pl-8}" y="${Y(v)+4}" text-anchor="end" class="ct">${v*100}%</text>`});
-  const mo=new Date(ymdP(x0).getFullYear(),ymdP(x0).getMonth()+1,1);let k=0;while(ymd(mo)<=x1&&k<24){s+=`<text x="${X(ymd(mo))}" y="${H-8}" text-anchor="middle" class="ct">${mo.toLocaleDateString(undefined,{month:'short'})}</text>`;mo.setMonth(mo.getMonth()+(span>400?3:span>200?2:1));k++}
+  const by=Y(0),dl=ds=>ymdP(ds).toLocaleDateString(undefined,{day:'numeric',month:'short'});
+  {const tk=[x0,...g.ms.filter(m=>m.due&&m.due>x0&&m.due<x1).map(m=>m.due).sort(),x1].filter((d,i,a)=>a.indexOf(d)===i),keep=[],gap=W>800?78:66;
+   tk.forEach((d,i)=>{const x=X(d),last=i===tk.length-1;if(last){while(keep.length>1&&x-X(keep[keep.length-1])<gap)keep.pop();keep.push(d)}else if(!keep.length||x-X(keep[keep.length-1])>=gap)keep.push(d)});
+   s+=`<line x1="${pl}" x2="${W-pr}" y1="${by}" y2="${by}" class="gaxis"/>`;
+   keep.forEach((d,i)=>{const x=X(d),a=i===0?'start':i===keep.length-1?'end':'middle';s+=`<line x1="${x}" x2="${x}" y1="${by}" y2="${by+4}" class="gaxis"/><text x="${x}" y="${H-10}" text-anchor="${a}" class="ct">${dl(d)}</text>`})}
   const pts=a=>a.map(p=>`${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(' ');
   if(proj.length>1)s+=`<polyline points="${pts(proj)}" class="gproj"/>`;
   s+=`<g class="cat" style="${catVars(g.col)}">${act.length>1?`<polyline points="${pts(act)}" class="gact"/>`:''}<circle cx="${X(act[act.length-1][0])}" cy="${Y(act[act.length-1][1])}" r="5" class="gactd"/></g>`;
-  g.ms.filter(m=>m.due).forEach(m=>{s+=`<g class="cat" style="${catVars(urgCol(m.urg))}"><rect x="${X(m.due)-4}" y="${pt-14}" width="8" height="8" rx="2" transform="rotate(45 ${X(m.due)} ${pt-10})" class="gpin ${m.d?'dn':''}"/><title>${esc(m.t||'Milestone')} · ${shortD(m.due)}${m.time?' '+fmtT(m.time):''} · urgency ${m.urg}${m.d?' · done':''}</title></g>`});
+  g.ms.filter(m=>m.due).forEach(m=>{s+=`<g class="cat" style="${catVars(urgCol(m.urg))}"><line x1="${X(m.due)}" x2="${X(m.due)}" y1="${pt}" y2="${by}" class="gmsg"/><rect x="${X(m.due)-5}" y="${by-5}" width="10" height="10" rx="2" transform="rotate(45 ${X(m.due)} ${by})" class="gpin ${m.d?'dn':''}"/><title>${esc(m.t||'Milestone')} · ${shortD(m.due)}${m.time?' '+fmtT(m.time):''} · urgency ${m.urg}${m.d?' · done':''}</title></g>`});
   const tx=X(todayS());s+=`<line x1="${tx}" x2="${tx}" y1="${pt}" y2="${H-pb}" class="gtoday"/><text x="${tx+6}" y="${H-pb-8}" class="gtodayt">Today</text>`;
   return s+'</svg>'}
 function msLine(g){if(!g.start||!g.due)return `<div class="gtl gtl0"><span class="hint">Set the start and end dates to see your milestones on the line.</span></div>`;
@@ -3193,7 +3204,7 @@ function renderCal(){const P=$('p-cal');if(!P)return;const today=ymd(new Date())
   const start=monOf(calM),days=[];for(let i=0;i<42;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d)}
   const byDate={};S.hist.forEach(h=>{(byDate[h.date]=byDate[h.date]||[]).push(h)});
   const exOf=ds=>{const d=ymdP(ds),dow=(d.getDay()+6)%7,L=S.wlog&&S.wlog[weekOf(ds)],hs=byDate[ds]||[],done=new Set(hs.map(h=>h.splitId||'')),out=[],seen=new Set();
-    (L?L.items:[]).filter(x=>x.d===dow).forEach(x=>{const k=x.title+'|'+x.s;if(seen.has(k))return;seen.add(k);out.push({...x,lg:x.splits.some(id=>done.has(id))})});
+    (L?L.items:[]).filter(x=>x.d===dow).flatMap(x=>x.splits.length?x.splits.map(id=>{const sp=getSp(id);return {...x,title:sp?sp.name||'Split':x.title,col:sp?sp.col:x.col,splits:[id]}}):[x]).forEach(x=>{const k=x.title+'|'+x.s;if(seen.has(k))return;seen.add(k);out.push({...x,lg:x.splits.some(id=>done.has(id))})});
     [...done].forEach(id=>{if(out.some(x=>x.splits.includes(id)))return;const sp=getSp(id);out.push({title:sp?sp.name||'Split':'Training',col:sp?sp.col:'slate',splits:[id],lg:true,s:-1})});return out};
   migrateGoals();const gBy={},push=(d,x)=>(gBy[d]=gBy[d]||[]).push(x),AG=allGoals().filter(x=>x.g.status!=='off');AG.forEach(({p,g})=>{if(g.due)push(g.due,{_gd:1,p,g,col:p.col,title:pName(p)+' - '+(g.title||'goal')});g.ms.forEach(m=>{if(m.due)push(m.due,{_ms:1,p,g,m,col:p.col,title:m.t||'Milestone'})})});
   days.forEach(d=>{const ds=ymd(d);AG.forEach(({p,g})=>{if(checkinsIn(g,ds))push(ds,{_ci:1,p,g,col:p.col,title:'Check in: '+(g.title||'goal')})})});
@@ -3204,7 +3215,7 @@ function renderCal(){const P=$('p-cal');if(!P)return;const today=ymd(new Date())
   days.forEach(d=>{const ds=ymd(d),inM=d.getMonth()===calM.getMonth(),hs=byDate[ds]||[],gs=gBy[ds]||[],sps=[...new Set(hs.map(x=>x.splitId||''))],pl=(TT()?TT().blocks:[]).filter(b=>b.wk===weekOf(ds)&&b.d===(d.getDay()+6)%7).reduce((a,b)=>a+b.e-b.s,0);
     h+=`<button class="cc ${inM?'':'out'} ${ds<today?'past':''} ${ds===today?'tod':''} ${ds===calSel?'sel':''}" data-act="calday" data-d="${ds}" aria-label="${esc(d.toDateString())}${hs.length?', trained':''}${gs.length?', '+gs.length+' goal due':''}" aria-pressed="${ds===calSel}"><span class="cn">${d.getDate()}</span>${pl?`<span class="cpl">${hrs(pl)} planned</span>`:''}`+
       (()=>{const ex=exOf(ds),ne=Math.min(ex.length,gs.length?2:3),ng=Math.min(gs.length,Math.max(1,3-ne)),more=ex.length-ne+gs.length-ng;
-        return `<span class="ccaps">`+ex.slice(0,ne).map(x=>`<span class="ccap cat" style="${catVars(x.col)}" title="${esc(x.title)}${x.lg?', logged in Training':''}">${ic('dumbbell')}<span class="cct">${esc(x.title)}</span>${x.lg?`<span class="cck">${ic('check')}</span>`:''}</span>`).join('')+gs.slice(0,ng).map(g=>`<span class="ccap cat ${g._ci?'ci':''}" style="${catVars(g.col)}" title="${esc(g.title||'')}">${ic(g._ms?'pin':g._ci?'calendar':'target')}<span class="cct">${esc(g._ms?g.title:g._ci?'Check in':g.title||'Untitled goal')}</span></span>`).join('')+(more>0?`<span class="cmore">+${more} more</span>`:'')+`</span>`})()+`</button>`});
+        return `<span class="ccaps">`+ex.slice(0,ne).map(x=>`<span class="ccap cat" style="${catVars(x.col)}" title="${esc(x.title)}${x.lg?', logged in Training':''}"><i class="ccd ${x.lg?'on':''}"></i><span class="cct">${esc(x.title)}</span></span>`).join('')+gs.slice(0,ng).map(g=>`<span class="ccap cat ${g._ci?'ci':''}" style="${catVars(g.col)}" title="${esc(g.title||'')}">${ic(g._ms?'pin':g._ci?'calendar':'target')}<span class="cct">${esc(g._ms?g.title:g._ci?'Check in':g.title||'Untitled goal')}</span></span>`).join('')+(more>0?`<span class="cmore">+${more} more</span>`:'')+`</span>`})()+`</button>`});
   h+=`</div></div><div class="card cald">${dayDetail(calSel,byDate[calSel]||[],gBy[calSel]||[],exOf(calSel))}</div></div>`;
   still(P,'cal');P.innerHTML=h}
 function dayDetail(ds,hs,gs,ex){ex=ex||[];const d=ymdP(ds),dow=(d.getDay()+6)%7,bl=(TT()?TT().blocks:[]).filter(b=>b.d===dow&&b.wk===weekOf(ds)).sort((a,b)=>a.s-b.s);
@@ -3213,11 +3224,11 @@ function dayDetail(ds,hs,gs,ex){ex=ex||[];const d=ymdP(ds),dow=(d.getDay()+6)%7,
   let h=`<div class="cdh"><div class="lab">${esc(rel)}</div><h2>${d.toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'})}</h2></div>
    <div class="ostat4 c2">${[[sess||0,'sessions'],[hs.length,'exercises'],[sets,'sets'],[sch?hrs(sch):'None','scheduled']].map(tileHTML).join('')}</div>`;
   h+=`<div class="csec"><span class="lab">Training</span>`;
-  const schx=ex.filter(x=>x.s>=0);if(schx.length)h+=`<div class="cexl">${schx.map(x=>`<div class="cexr cat ${x.lg?'lg':''}" style="${catVars(x.col)}"><i></i><b>${esc(x.title)}</b><span class="mo">${fmt(x.s)} to ${fmt(x.e)}</span><span class="hint">${x.lg?'Logged in Training':'Scheduled'}</span></div>`).join('')}</div>`;
-  if(hs.length){const by={};hs.forEach(x=>{const k=x.splitId||'';(by[k]=by[k]||[]).push(x)});
-    h+=Object.entries(by).map(([k,xs])=>{const sp=getSp(k);return `<div class="ctr"><div class="ctrh cat" style="${catVars(sp?sp.col:'slate')}"><span class="cdot"></span><b>${esc(sp?sp.name||'Untitled split':'No split')}</b><span class="hint">${xs.length} exercise${xs.length===1?'':'s'}</span></div>${xs.map(x=>`<div class="ctrr"><span>${esc(exInfo(x.exId).name)}</span><span>${specOf(x)}</span></div>`).join('')}</div>`}).join('');
-    if(kc)h+=`<p class="hint">About ${Math.round(kc)} kcal burned on cardio, estimated.</p>`}
-  else if(!schx.length)h+=`<p class="hint">${ds>ymd(new Date())?'Nothing logged yet. Log sessions from Training on the day.':'Nothing logged this day.'}</p>`;
+  {const by={};hs.forEach(x=>{const k=x.splitId||'';(by[k]=by[k]||[]).push(x)});const cards=[],used=new Set();
+   ex.forEach(x=>{const id=x.splits[0];if(id){if(used.has(id))return;used.add(id);const sp=getSp(id),L=by[id];cards.push({title:sp?sp.name||'Split':x.title,col:sp?sp.col:x.col,lg:!!L,time:x.s>=0?`${fmt(x.s)} to ${fmt(x.e)}`:'',rows:L?L.map(r=>[exInfo(r.exId).name,specOf(r)]):(sp?sp.items.filter(i=>i.exId).map(i=>[exInfo(i.exId).name,specOf(i)]):[])})}else cards.push({title:x.title,col:x.col,lg:false,time:x.s>=0?`${fmt(x.s)} to ${fmt(x.e)}`:'',rows:[]})});
+   Object.entries(by).forEach(([k,L])=>{if(used.has(k))return;const sp=getSp(k);cards.push({title:sp?sp.name||'Split':'No split',col:sp?sp.col:'slate',lg:true,time:'',rows:L.map(r=>[exInfo(r.exId).name,specOf(r)])})});
+   if(cards.length){h+=cards.map(c=>`<div class="ctr"><div class="ctrh cat" style="${catVars(c.col)}"><i class="ccd ${c.lg?'on':''}"></i><b>${esc(c.title)}</b><span class="hint">${c.time||(c.rows.length?c.rows.length+' exercise'+(c.rows.length===1?'':'s'):'')}</span></div>${c.rows.map(r=>`<div class="ctrr"><span>${esc(r[0])}</span><span>${r[1]}</span></div>`).join('')}</div>`).join('');if(kc)h+=`<p class="hint">About ${Math.round(kc)} kcal burned on cardio, estimated.</p>`}
+   else h+=`<p class="hint">${ds>ymd(new Date())?'Nothing planned yet.':'No training this day.'}</p>`}
   h+='</div>';
   h+=`<div class="csec"><div class="csh"><span class="lab">Goals</span><button class="lk" data-act="calgoal" data-d="${ds}">${ic('plus')}New project</button></div>`;
   const gx=x=>{const at=`data-act="calopen" data-id="${x.p.id}" data-g="${x.g.id}"`;if(x._ms){const st=msStat(x.m);return `<button class="cgoal cat" style="${catVars(x.col)}" ${at}><span class="gdot"></span><span class="cgt"><b>${esc(x.m.t||'Milestone')}${x.m.time?' · '+fmtT(x.m.time):''}</b><span class="hint">${esc(pName(x.p))} - ${esc(x.g.title)} · ${st[0]}</span></span>${urgPill(x.m.urg)}</button>`}
