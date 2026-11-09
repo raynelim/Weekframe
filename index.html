@@ -1054,7 +1054,7 @@ body.is-sorting,body.is-sorting *{cursor:grabbing!important;user-select:none!imp
 .pfme{gap:18px;padding:18px 20px}
 .pff{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .pfx{display:flex;flex-direction:column;gap:6px;background:var(--sunk);border-radius:12px;padding:12px 14px;cursor:text;min-width:0;transition:box-shadow .15s}
-.pfx:first-child{grid-column:1/-1;cursor:default}
+.pff>.pfx:first-child{grid-column:1/-1;cursor:default}
 .pfx:focus-within{box-shadow:0 0 0 2px var(--line)}
 .pfx .k{font-size:13px;font-weight:500;color:var(--muted)}
 .pfv{display:flex;align-items:baseline;gap:6px}
@@ -1614,6 +1614,39 @@ body.gtdragging,body.gtdragging *{cursor:grabbing!important}
 .ccd{width:9px;height:9px;border-radius:50%;flex:none;box-sizing:border-box;border:2px solid var(--s);background:var(--surface)}
 .ccd.on{background:var(--s)}
 .ctrh .ccd{width:11px;height:11px}
+
+.qwrap{display:inline;margin:0;padding:0;border:0;background:none;quotes:none}
+.qwrap::before{content:'\201C'}.qwrap::after{content:'\201D'}
+.quote .qline>blockquote.qwrap{display:block;flex:0 1 auto;min-width:0;max-width:min(100%,40ch);position:relative;z-index:1}
+.qline>.qwrap>.qed{margin:0;padding:0 .06em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.qrow .qwrap{justify-self:start;max-width:100%;min-width:0;display:inline-flex;align-items:center;font-size:14px}
+.qrow .qwrap>.qed{display:inline-block;min-width:4ch;max-width:min(100%,560px);margin:0!important;padding:3px 3px!important;overflow-wrap:anywhere}
+.qrow>.qok{display:inline-flex!important;visibility:hidden}
+.qrow:has(.qed:focus)>.qok{visibility:visible}
+.qrow .qwrap::before,.qrow .qwrap::after{color:var(--muted)}
+.qaddl{margin-top:10px!important;margin-bottom:14px}
+.qlist{padding-bottom:6px}
+.qdelb{width:28px;height:28px;color:var(--muted)}
+.qdelb:hover{color:var(--danger,#c0392b)}
+.qdelb.armed{color:#fff;background:var(--danger,#c0392b);border-radius:8px}
+
+.ccaps{align-items:stretch!important;gap:4px!important;margin-top:2px}
+.ccap{display:flex!important;width:100%;box-sizing:border-box;height:22px;padding:0 9px 0 7px!important;font-size:11.5px!important;gap:6px!important}
+@media (min-width:761px){.cc{padding:7px 8px!important}}
+
+.pflog{display:flex;flex-direction:column;gap:10px;padding-top:4px}
+.pflf{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}
+.pflf>label:nth-child(3){grid-column:1/-1}.pflf .pflb{grid-column:1/-1;justify-content:center}
+.pflf .pfi[type=date]{font-size:18px}
+.pflf .pfx{min-width:0}
+.pflf .pfi[type=date]{width:100%}
+.pflb{height:40px}
+.pfhist{display:flex;flex-direction:column;max-height:300px;overflow:auto;border-top:1px solid var(--line2)}
+.pfhr{display:grid;grid-template-columns:minmax(0,1.4fr) 1fr 1fr .7fr 64px;gap:10px;align-items:center;padding:7px 2px;border-bottom:1px solid var(--line2);font-size:13.5px}
+.pfhr.pfhh{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;background:var(--surface);z-index:1}
+.pfhr.cur{background:var(--sunk)}
+.pfha{display:flex;justify-content:flex-end;gap:2px}.pfha .ib{width:28px;height:28px}
+@media (max-width:760px){.pfhr{grid-template-columns:minmax(0,1.3fr) 1fr 1fr 60px}.pfhr>span:nth-child(4){display:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1966,7 +1999,9 @@ const B={
 };
 
 /* ---------- actions ---------- */
-function armed(btn,label){if(btn.dataset.armed){return true}btn.dataset.armed='1';btn.classList.add('armed');const o=btn.innerHTML;btn.innerHTML=label;setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.classList.remove('armed');btn.innerHTML=o}},3200);return false}
+function armed(btn,label){if(btn.dataset.armed){return true}btn.dataset.armed='1';btn.classList.add('armed');const o=btn.innerHTML;btn._ao=o;btn.innerHTML=label;setTimeout(()=>disarm(btn),4000);return false}
+function disarm(btn){if(btn.isConnected&&btn.dataset.armed){delete btn.dataset.armed;btn.classList.remove('armed');btn.innerHTML=btn._ao}}
+document.addEventListener('pointerdown',e=>{document.querySelectorAll('[data-armed]').forEach(b=>{if(!b.contains(e.target))disarm(b)})},true);
 function editB(fn){const b=getB(modeArg.id);if(!b)return;if(!editPushed){pushUndo();editPushed=true}fn(b);save();renderGrid();renderChips();renderNow()}
 function newBlock(d,s,e){const id=uid();const b={id,d,s,e,wk:viewWk,title:'',cat:S.focus||(S.cats[0]?.id??null),loc:'',notes:''};TT().blocks.push(b);return b}
 function nextDay(d){const v=vdays(),i=v.indexOf(d);return v[(i+1)%v.length]}
@@ -2265,7 +2300,6 @@ document.addEventListener('keydown',e=>{
   if(typing)return;
   if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return}
   if(mod&&k==='y'){e.preventDefault();redo();return}
-  if(!mod&&!e.altKey&&/^[1-5]$/.test(e.key)){go(+e.key-1);return}
   if(!mod&&(e.key==='['||e.key===']')){go(page+(e.key===']'?1:-1));return}
   if(page!==1)return;
   if(k==='n'&&!mod){e.preventDefault();const st=S.set,d=vdays().includes(todayIdx())?todayIdx():vdays()[0];let s=clamp(Math.ceil(nowMin()/st.snap)*st.snap,st.start*60,st.end*60-60);pushUndo();const b=newBlock(d,s,s+60);S.example=false;sel=b.id;save();renderAll();openDrawer('block',{id:b.id,focus:true});return}
@@ -2680,13 +2714,14 @@ window.addEventListener('resize',closePal);
 /* ---------- goals ---------- */
 let qi=0,qform=false,qman=false;const qd={t:'',a:''};
 function daysLeft(ds){if(!ds)return null;const [Y,M,D]=ds.split('-').map(Number),t=new Date();t.setHours(0,0,0,0);return Math.round((new Date(Y,M-1,D)-t)/864e5)}
-function quoteHTML(){const Q=S.quotes;if(qi>=Q.length)qi=0;const q=Q[qi];
-  return `<div class="quote qbanner ${qman?'qm':''}" id="qbanner">${q?`<div class="qmid" data-k="${q.id}"><div class="qline"><blockquote class="qed" contenteditable="plaintext-only" spellcheck="false" data-f="qtx" data-id="${q.id}" data-ph="Write a line that gets you moving" title="Click to edit">${esc(q.t)}</blockquote><button class="qok" data-act="qok" aria-label="Confirm" title="Confirm (Enter)">${ic('check')}</button></div>${q.a?`<div class="qline"><div class="by qed" contenteditable="plaintext-only" spellcheck="false" data-f="qby" data-id="${q.id}" title="Click to edit">${esc(q.a)}</div><button class="qok" data-act="qok" aria-label="Confirm" title="Confirm (Enter)">${ic('check')}</button></div>`:''}</div>`:`<div class="qmid"><button class="qempty" data-act="qadd" title="Click to write your first line">Add a line that gets you moving.</button></div>`}
+function quoteHTML(){const Q=S.quotes;if(!S.set.qmk){Q.forEach(x=>{if(typeof x.t==='string')x.t=x.t.trim().replace(/^["\u201c\u201d]+/,'').replace(/["\u201c\u201d]+$/,'').trim()});S.set.qmk=1;save()}if(qi>=Q.length)qi=0;const q=Q[qi];
+  return `<div class="quote qbanner ${qman?'qm':''}" id="qbanner">${q?`<div class="qmid" data-k="${q.id}"><div class="qline"><blockquote class="qwrap" data-id="${q.id}"><span class="qed" contenteditable="plaintext-only" spellcheck="false" data-f="qtx" data-id="${q.id}" data-ph="Write a line that gets you moving" title="Click to edit">${esc(q.t)}</span></blockquote><button class="qok" data-act="qok" aria-label="Confirm" title="Confirm (Enter)">${ic('check')}</button></div>${q.a?`<div class="qline"><div class="by qed" contenteditable="plaintext-only" spellcheck="false" data-f="qby" data-id="${q.id}" title="Click to edit">${esc(q.a)}</div><button class="qok" data-act="qok" aria-label="Confirm" title="Confirm (Enter)">${ic('check')}</button></div>`:''}</div>`:`<div class="qmid"><button class="qempty" data-act="qadd" title="Click to write your first line">Add a line that gets you moving.</button></div>`}
    <button class="btn qmanb ${qman?'pri':''}" data-act="qman">${qman?ic('check')+'Done':ic('edit')+'Manage'}</button>
    ${Q.length>1?`<div class="qfoot"><div class="qdots" role="tablist" aria-label="Lines">${Q.map((x,i)=>`<button class="qdot ${i===qi?'on':''}" data-act="qpick" data-i="${i}" aria-label="Show line ${i+1}"></button>`).join('')}</div></div>`:''}
-   ${qman?`<div class="qlist" data-sort="quotes">${Q.map((x,i)=>`<div class="ms qrow ${i===qi?'cur':''}" data-sid="${x.id}"><span class="grip" data-grip title="Drag to reorder" aria-hidden="true">${ic('grip')}</span><button class="qpick" data-act="qpick" data-i="${i}" aria-label="Show this line"></button><span class="qed" contenteditable="plaintext-only" spellcheck="false" data-f="qtx" data-id="${x.id}" data-ph="Empty line">${esc(x.t)}</span><span class="qed qa" contenteditable="plaintext-only" spellcheck="false" data-f="qby" data-id="${x.id}" data-ph="Who said it">${esc(x.a)}</span><button class="qok" data-act="qok" aria-label="Confirm" title="Confirm (Enter)">${ic('check')}</button><button class="xb" style="opacity:1" data-act="qdel" data-id="${x.id}" aria-label="Delete line">${ic('x')}</button></div>`).join('')}<button class="addl qaddl" data-act="qadd">${ic('plus')}Add a line</button></div>`:''}
+   ${qman?`<div class="qlist" data-sort="quotes">${Q.map((x,i)=>`<div class="ms qrow ${i===qi?'cur':''}" data-sid="${x.id}"><span class="grip" data-grip title="Drag to reorder" aria-hidden="true">${ic('grip')}</span><button class="qpick" data-act="qpick" data-i="${i}" aria-label="Show this line"></button><span class="qwrap" data-id="${x.id}"><span class="qed" contenteditable="plaintext-only" spellcheck="false" data-f="qtx" data-id="${x.id}" data-ph="Type a line">${esc(x.t)}</span></span><span class="qed qa" contenteditable="plaintext-only" spellcheck="false" data-f="qby" data-id="${x.id}" data-ph="Who said it">${esc(x.a)}</span><button class="qok" data-act="qok" aria-label="Confirm" title="Confirm (Enter)">${ic('check')}</button><button class="ib qdelb" data-act="qdel" data-id="${x.id}" aria-label="Delete line" title="Delete">${ic('trash')}</button></div>`).join('')}<button class="addl qaddl" data-act="qadd">${ic('plus')}Add a line</button></div>`:''}
   </div>`}
 let qShownAt=Date.now();
+document.addEventListener('mousedown',e=>{const w=e.target.closest&&e.target.closest('.qwrap');if(!w||e.target.closest('.qed'))return;const ed=w.querySelector('.qed');if(!ed)return;e.preventDefault();ed.focus();try{const r=document.createRange();r.selectNodeContents(ed);r.collapse(false);const sl=getSelection();sl.removeAllRanges();sl.addRange(r)}catch(_){}});
 function refreshQuote(){const el=$('qbanner');if(el){el.outerHTML=quoteHTML();qShownAt=Date.now();fitQuote()}}
 function fitQuote(){const b=$('qbanner');if(!b||qman)return;const mid=b.querySelector('.qmid'),q=mid&&mid.querySelector('blockquote,.qempty');if(!q)return;
   const by=mid.querySelector('.by'),room=mid.clientHeight-(by?by.offsetHeight+12:0),W=mid.clientWidth;let lo=22,hi=96;q.style.maxWidth='none';
@@ -2972,12 +3007,12 @@ document.addEventListener('click',e=>{
   case 'exlibdel':{if(!armed(t,'Tap again to remove'))break;pushUndo();const id=t.dataset.id;S.exlib=S.exlib.filter(x=>x.id!==id);S.splits.forEach(sp=>sp.items.forEach(i=>{if(i.exId===id)i.exId=''}));S.hist=S.hist.filter(h=>h.exId!==id);expEx.delete(id);save();renderEx();toast('Exercise removed');break}
   case 'logblock':{const b=getB(modeArg.id);if(!b||!b.split)break;closeDrawer();go(2);openLog(b.split);setTimeout(()=>{const c=document.querySelector(`#spn-${b.split}`);c&&c.closest('.scard').scrollIntoView({behavior:'smooth',block:'center'})},380);break}
   case 'qnext':{const n=S.quotes.length;if(n>1)qi=(qi+1)%n;renderGoals();break}
-  case 'qadd':{pushUndo();const nq={id:uid(),t:'\u201c\u201d',a:''};S.quotes.push(nq);qi=S.quotes.length-1;save();renderGoals();const el=document.querySelector(`.quote .qline>blockquote[data-id="${nq.id}"]`);if(el){qEditStart=true;el.focus();caretAt(el,1)}break}
+  case 'qadd':{pushUndo();const nq={id:uid(),t:'',a:''};S.quotes.push(nq);qi=S.quotes.length-1;save();renderGoals();const el=document.querySelector(qman?`.qlist [data-f=qtx][data-id="${nq.id}"]`:`#qbanner .qline [data-f=qtx][data-id="${nq.id}"]`);if(el){qEditStart=true;el.focus()}break}
   case 'qpick':{qi=+t.dataset.i;refreshQuote();break}
   case 'qok':{const a=document.activeElement;if(a&&a.blur)a.blur();break}
   case 'qman':qman=!qman;renderGoals();break;
   case 'qsave':saveQuote();break;
-  case 'qdel':{pushUndo();S.quotes=S.quotes.filter(x=>x.id!==t.dataset.id);if(qi>=S.quotes.length)qi=Math.max(0,S.quotes.length-1);save();renderGoals();toast('Line deleted');break}
+  case 'qdel':{if(!armed(t,ic('check')))break;pushUndo();S.quotes=S.quotes.filter(x=>x.id!==t.dataset.id);if(qi>=S.quotes.length)qi=Math.max(0,S.quotes.length-1);save();renderGoals();toast('Line deleted');break}
   case 'gnew':{pushUndo();const used=S.goals.map(g=>g.col),g={id:uid(),title:'',why:'',due:'',col:nextCol(used),p:0,ms:[]};S.goals.push(g);save();renderGoals();const f=$('gt-'+g.id);f&&f.focus();break}
   case 'gdel':{if(!armed(t,ic('check')))break;pushUndo();S.goals=S.goals.filter(g=>g.id!==t.dataset.id);save();renderGoals();toast('Goal deleted');break}
   case 'gcol':{const g=getG(t.dataset.id);openPal(t,g.col,k=>{pushUndo();g.col=k;save();renderGoals()});break}
@@ -3035,6 +3070,25 @@ const bmiCat=(b,std)=>{const c=BMIS[std]||BMIS.who;let i=0;while(i<3&&b>=c.cuts[
 function profWeek(){const m=monOf(new Date());m.setDate(m.getDate()+profOff*7);const o=[];for(let i=0;i<7;i++){const d=new Date(m);d.setDate(d.getDate()+i);o.push(ymd(d))}return o}
 const actLevel=n=>n>=7?[1.9,'very hard']:n>=5?[1.725,'very active']:n>=3?[1.55,'moderately active']:n>=1?[1.375,'lightly active']:[1.2,'not active'];
 const fmtK=n=>Math.round(n).toLocaleString();
+let pfD={h:'',w:'',d:''};
+function pfLatest(k){const L=S.body.slice().sort((a,b)=>b.date.localeCompare(a.date)).find(e=>+e[k]);return L?+L[k]:''}
+function pfReset(){pfD={h:pfLatest('h')||S.profile.h||'',w:pfLatest('w')||S.profile.w||'',d:ymd(new Date())}}
+function pfSync(){const P=S.profile;P.h=pfLatest('h')||P.h||'';P.w=pfLatest('w')||P.w||'';if(+P.w)S.set.bw=+P.w}
+function pfHist(){const L=S.body.slice().sort((a,b)=>b.date.localeCompare(a.date));if(!L.length)return `<p class="hint" style="margin:0">Log your weight and height to start tracking.</p>`;
+  return `<div class="pfhist"><div class="pfhr pfhh"><span>Date</span><span>Weight</span><span>Height</span><span>BMI</span><span></span></div>${L.map(e=>{const b=bmiOf(+e.h,+e.w);return `<div class="pfhr ${e.date===pfD.d?'cur':''}"><span>${ymdP(e.date).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})}</span><span class="mo">${+e.w?fmtW(+e.w)+' kg':'-'}</span><span class="mo">${+e.h?fmtW(+e.h)+' cm':'-'}</span><span class="mo">${b?fmtW(b):'-'}</span><span class="pfha"><button class="ib" data-act="pfedit" data-d="${e.date}" aria-label="Edit entry" title="Edit">${ic('edit')}</button><button class="ib qdelb" data-act="pfdel" data-d="${e.date}" aria-label="Delete entry" title="Delete">${ic('trash')}</button></span></div>`}).join('')}</div>`}
+function pfLog(){const err=$('pfl-err'),num=v=>{v=String(v).trim().replace(',','.');return v===''?'':+v},w=num(pfD.w),h=num(pfD.h),d=pfD.d||ymd(new Date());
+  const bad=m=>{if(err){err.textContent=m;err.hidden=false}};
+  if(w===''&&h===''){bad('Add your weight or height first.');return}
+  if(w!==''&&(isNaN(w)||w<25||w>250)){bad('Weight should be between 25 and 250 kg.');return}
+  if(h!==''&&(isNaN(h)||h<100||h>230)){bad('Height should be between 100 and 230 cm.');return}
+  if(d>ymd(new Date())){bad('That date is in the future.');return}
+  pushUndo();let e=S.body.find(x=>x.date===d);const upd=!!e;if(!e){e={date:d};S.body.push(e)}if(w!=='')e.w=w;if(h!=='')e.h=h;pfSync();save();pfReset();renderProf();renderEx();toast(upd?'Entry updated':'Logged for '+shortD(d))}
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.f==='pfl'){pfD[t.dataset.k]=t.value;const er=$('pfl-err');if(er)er.hidden=true;if(t.dataset.k==='d'){const b=document.querySelector('.pflb');if(b)b.innerHTML=ic('check')+(S.body.some(x=>x.date===t.value)?'Update':'Log')}}});
+document.addEventListener('keydown',e=>{const t=e.target;if(t.dataset&&t.dataset.f==='pfl'&&e.key==='Enter'){e.preventDefault();pfLog()}});
+document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
+  if(a==='pflog')pfLog();
+  else if(a==='pfedit'){const x=S.body.find(y=>y.date===t.dataset.d);if(!x)return;pfD={w:x.w||'',h:x.h||'',d:x.date};renderProf();const f=document.querySelector('[data-f=pfl][data-k=w]');if(f){f.focus();f.select()}}
+  else if(a==='pfdel'){if(!armed(t,ic('check')))return;pushUndo();S.body=S.body.filter(y=>y.date!==t.dataset.d);pfSync();save();pfReset();renderProf();renderEx();toast('Entry deleted')}});
 function logBody(){const P=S.profile,d=ymd(new Date());if(!(+P.h)&&!(+P.w))return;let e=S.body.find(x=>x.date===d);if(!e){e={date:d};S.body.push(e)}e.h=+P.h||'';e.w=+P.w||'';S.set.bw=+P.w||S.set.bw}
 function bodyPts(k){return S.body.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(e=>({date:e.date,v:k==='b'?bmiOf(e.h,e.w):+e[k]||null})).filter(p=>p.v)}
 function lineChart(pts,unit,lab,bands){const W=900,Hh=240,pl=46,pr=18,pt=16,pb=30;
@@ -3055,6 +3109,7 @@ function lineChart(pts,unit,lab,bands){const W=900,Hh=240,pl=46,pr=18,pt=16,pb=3
 function renderProf(){const H=$('p-prof');if(!H)return;const keep=TIPS;TIPS=[];
   const P=S.profile,std=BMIS[P.std]?P.std:'who',B=BMIS[std],wk=profWeek(),wks=new Set(wk),age=+P.age,h=+P.h,w=+P.w,bmi=bmiOf(h,w),ci=bmi?bmiCat(bmi,std):-1;
   const wlab=profOff===0?'This week':profOff===-1?'Last week':profOff===1?'Next week':'Week of '+shortD(wk[0]);
+  if(!pfD.d)pfReset();const lfld=(k,lab,unit,step)=>`<label class="pfx"><span class="k">${lab}</span><span class="pfv"><input class="pfi" type="text" inputmode="decimal" data-f="pfl" data-k="${k}" value="${pfD[k]}" placeholder="Add" autocomplete="off" aria-label="${lab}"><small>${unit}</small></span></label>`;
   const fld=(k,lab,unit,min,max,step)=>`<label class="pfx"><span class="k">${lab}</span><span class="pfv"><input class="pfi" type="number" inputmode="decimal" data-f="pf" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${P[k]===''||P[k]==null?'':P[k]}" placeholder="Add" aria-label="${lab}"><small>${unit}</small></span></label>`;
   // estimates
   const HW=wk.length?S.hist.filter(x=>wks.has(x.date)):[],tdays=new Set(HW.map(x=>x.date)).size,act=actLevel(tdays);
@@ -3070,7 +3125,8 @@ function renderProf(){const H=$('p-prof');if(!H)return;const keep=TIPS;TIPS=[];
     ['Daily calorie needs',tdee?fmtK(tdee)+' kcal a day':'Needs your BMR first',tdee?`${tdays} training day${tdays===1?'':'s'} ${profOff===0?'this week':'that week'}, ${act[1]}`:''],
     ['Body fat, estimated',bf?fmtW(bf)+'%':age&&age<18?'Not for under 18':'Add gender and age',bf?'From BMI, age and gender':'']];
   let h1=`<div class="pfh"><div><h1>Profile</h1><p class="hint">Your body stats and a summary of your week.</p></div><div class="wnav pfwk"><button class="ib" data-act="pfwk" data-d="-1" aria-label="Previous week">${ic('back')}</button><span><b>${wlab}</b><small>${shortD(wk[0])} to ${shortD(wk[6])}</small></span><button class="ib fwd" data-act="pfwk" data-d="1" aria-label="Next week">${ic('back')}</button></div></div>
-  <div class="pfgrid"><div class="card pfme"><div class="pff"><div class="pfx"><span class="k">Gender</span><div class="seg">${[['m','Male'],['f','Female'],['o','Other']].map(([v,l])=>`<button class="sg ${P.sex===v?'on':''}" data-act="pfsex" data-v="${v}">${l}</button>`).join('')}</div></div>${fld('age','Age','years',10,100,1)}${fld('h','Height','cm',100,230,.5)}${fld('w','Weight','kg',25,250,.1)}</div>
+  <div class="pfgrid"><div class="card pfme"><div class="pff"><div class="pfx"><span class="k">Gender</span><div class="seg">${[['m','Male'],['f','Female'],['o','Other']].map(([v,l])=>`<button class="sg ${P.sex===v?'on':''}" data-act="pfsex" data-v="${v}">${l}</button>`).join('')}</div></div>${fld('age','Age','years',10,100,1)}</div>
+   <div class="pflog"><div class="lab">Log body</div><div class="pflf">${lfld('w','Weight','kg',.1)}${lfld('h','Height','cm',.5)}<label class="pfx"><span class="k">Date</span><span class="pfv"><input class="pfi" type="date" id="pfl-d" data-f="pfl" data-k="d" value="${pfD.d}" max="${ymd(new Date())}" aria-label="Date"></span></label><button class="btn pri pflb" data-act="pflog">${ic('check')}${S.body.some(e=>e.date===pfD.d)?'Update':'Log'}</button></div><p class="err" id="pfl-err" hidden></p></div>
    <div class="bmi"><div class="bmih"><div><div class="lab">BMI</div><div class="bmiv">${bmi?fmtW(bmi):'<span class="none">None</span>'}</div></div>${bmi?`<span class="pill cat" style="${catVars(BMIC[ci])}">${B.labs[ci]}</span>`:'<span class="hint">Add height and weight</span>'}<span class="sp"></span><div class="seg sm" role="group" aria-label="BMI ranges"><button class="sg ${std==='who'?'on':''}" data-act="pfstd" data-v="who" title="World Health Organization ranges">WHO</button><button class="sg ${std==='asian'?'on':''}" data-act="pfstd" data-v="asian" title="Lower cut offs used for Asian adults, as in Singapore">Asian</button></div></div>${gauge}</div>
    <div class="ests">${est.map(e=>`<div class="est"><span class="k">${e[0]}</span><b>${e[1]}</b>${e[2]?`<span class="hint">${e[2]}</span>`:''}</div>`).join('')}</div>
    <p class="hint pfnote">${age&&age<18?'Under 18, BMI is judged against age percentiles, so these adult ranges are only a rough guide. ':''}Estimates use standard formulas and are a guide, not a measurement.</p></div>`;
@@ -3080,7 +3136,7 @@ function renderProf(){const H=$('p-prof');if(!H)return;const keep=TIPS;TIPS=[];
   const dl=(a,b)=>{const d=a-b;return (d>0?'+':'')+fmtW(d)};
   const u=ser[1]?`<small> ${ser[1]}</small>`:'';
   const btiles=[[last?fmtW(last.v)+u:'None','latest '+ser[0].toLowerCase()],[inW&&before?dl(inW.v,before.v)+u:'None',`change ${profOff===0?'this week':'that week'}`],[last&&first&&pts.length>1?dl(last.v,first.v)+u:'None','since first entry'],[S.body.length,'entries logged']];
-  h1+=`<div class="card pfbody"><div class="chd"><div class="lab">Body over time</div><div class="seg sm">${[['w','Weight'],['h','Height'],['b','BMI']].map(([k,l])=>`<button class="sg ${profSer===k?'on':''}" data-act="pfser" data-v="${k}">${l}</button>`).join('')}</div></div>${lineChart(pts,ser[1],ser[0],ser[2])}<div class="ostat4">${btiles.map(tileHTML).join('')}</div><p class="hint" style="margin:0">Each time you change your height or weight, it is saved for that day.</p></div></div>`;
+  h1+=`<div class="card pfbody"><div class="chd"><div class="lab">Body over time</div><div class="seg sm">${[['w','Weight'],['h','Height'],['b','BMI']].map(([k,l])=>`<button class="sg ${profSer===k?'on':''}" data-act="pfser" data-v="${k}">${l}</button>`).join('')}</div></div>${lineChart(pts,ser[1],ser[0],ser[2])}<div class="ostat4">${btiles.map(tileHTML).join('')}</div>${pfHist()}</div></div>`;
   // week plan summary
   const BL=WB(wk[0]),cm={},per=wk.map(()=>({}));BL.forEach(b=>{const m=b.e-b.s,k=getC(b.cat)?b.cat:'_';cm[k]=(cm[k]||0)+m;per[b.d][k]=(per[b.d][k]||0)+m});
   const cn=k=>getC(k)?getC(k).name:'No category',cc=k=>getC(k)?getC(k).col:'slate',tot=Object.values(cm).reduce((a,v)=>a+v,0);
