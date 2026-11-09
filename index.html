@@ -1655,6 +1655,24 @@ body.gtdragging,body.gtdragging *{cursor:grabbing!important}
 
 .pfsec+.trviz .lgd{max-height:none!important;overflow:visible!important}
 .pfline .ct{font-size:14px}.pfline .cl{stroke-width:2.5}
+
+.g2{gap:18px}
+.g2top{display:grid;grid-template-columns:minmax(220px,1.1fr) minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center}
+.g2leg{display:flex;flex-direction:column;gap:4px;min-width:0}
+.g2lr{display:grid;grid-template-columns:14px minmax(0,170px) 76px 86px;justify-content:start;gap:12px;align-items:center;font-size:16px;padding:6px 6px;border-radius:6px}
+.g2lr i{width:14px;height:14px;border-radius:4px;background:var(--s)}
+.g2lr .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.g2lr .v{text-align:right;font-family:var(--mono);font-size:15px;color:var(--ink)}
+.g2lr.dim{opacity:.5}
+.g2lh span{white-space:nowrap}.g2lh{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding-bottom:2px}
+.g2lh span:nth-child(n+3){text-align:right}
+.g2pie{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.g2pie .viz{display:block!important}.g2pie .lgd{display:none!important}
+.g2pie .pie{width:200px!important;height:200px!important;max-width:100%}
+.g2cap{font-size:12.5px;font-weight:600;color:var(--muted)}
+.g2bars{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;padding-top:14px;border-top:1px solid var(--line2)}
+.g2bars .bars{max-height:220px}
+@media (max-width:900px){.g2top{grid-template-columns:1fr 1fr}.g2leg{grid-column:1/-1}.g2bars{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -2562,16 +2580,32 @@ function groupRow(g,D){const gd=D.G[g],has=D.groups.includes(g),n=gd.exs.length;
   else{val=fmtW(gd.w);unit='sets';top=gd.mus[0]?cap(gd.mus[0][0]):''}
   const inner=`<span class="cdot cat" style="${catVars(GCOL[g])}"></span><span class="ln"><b>${g}</b><span class="hint">${n} exercise${n===1?'':'s'}</span></span><span class="lv"><b>${gd.dates.length}</b>days</span><span class="lv"><b>${val}</b>${unit}</span><span class="lv mh">${top?`<b style="font-size:17px">${esc(top)}</b>top`:''}</span><span class="lv mh lst">${gd.last?'Last trained '+lastLbl(gd.last):'Not trained yet'}</span>`;
   return has?`<button class="grw" data-act="trtab" data-t="${g}">${inner}${ic('chev')}</button>`:`<div class="grw off">${inner}<span></span></div>`}
-function mainBody(D,ids){return trTab==='overall'?overallBody(D,false,true):trTab==='week'?weekBody(ids):groupTab(trTab,D,ids)}
+function mainBody(D,ids){return trTab==='overall'?overallBody(D,false):trTab==='week'?weekBody(ids):groupTab(trTab,D,ids)}
 let GB8=false;
 function barDays(){if(!GB8)return wkDays();return Array.from({length:8},(_,i)=>{const m=monOf(new Date());m.setDate(m.getDate()-(7-i)*7);return ymd(m)})}
 function onBar(d,w){return GB8?weekOf(d)===w:d===w}
 function barHead(t){return GB8?`<div class="chd"><div class="lab">${esc(t.replace(' per day',' per week, last 8 weeks'))}</div></div>`:chartHead(t)}
-function groupTab(g,D,ids){const cut=h=>{const i=h.lastIndexOf('<div class="card trlist">');return i<0?[h,'']:[h.slice(0,i),h.slice(i)]},lab=(h,t)=>h.replace(/(<div class="lab">)([^<]*)/,'$1$2, '+t);
-  GB8=true;let a;try{a=groupBody(g,D)}finally{GB8=false}const [top,list]=cut(a);
-  const days=new Set(wkDays()),all=S.hist;S.hist=all.filter(x=>days.has(x.date));let w;try{w=groupBody(g,groupData(ids))}finally{S.hist=all}const wl=wkOff===0?'this week':wkOff===-1?'last week':'that week';
-  return lab(top,'all time')+lab(cut(w)[0],wl).split('Not trained yet').join('Not trained '+wl)+list}
-function weekBody(ids){const days=new Set(wkDays()),all=S.hist;S.hist=all.filter(h=>days.has(h.date));try{const Dw=groupData(ids);return (overallBody(Dw,true,true)).split('Not trained yet').join(wkOff===0?'Not trained this week':wkOff===-1?'Not trained last week':'Not trained that week')}finally{S.hist=all}}
+function groupTab(g,D,ids){const cut=h=>{const i=h.lastIndexOf('<div class="card trlist">');return i<0?h:h.slice(i)};const list=cut(groupBody(g,D));
+  const kind=g==='Cardio'?'c':g==='Custom'?'x':'m',unit=kind==='c'?'min':'sets',days=new Set(wkDays()),inW=h=>days.has(h.date);
+  const val=h=>kind==='c'?(exInfo(h.exId).group==='Cardio'?minutesOf(h):0):kind==='x'?(exInfo(h.exId).group==='Custom'?units(h):0):groupW(h,g);
+  const acc=H=>{const o={};H.forEach(h=>{if(kind==='m')hitMuscles(h).forEach(([m,w])=>{if(M2G[m]===g){const k=subOf(m);o[k]=(o[k]||0)+w}});else{const v=val(h);if(v>0)o[h.exId]=(o[h.exId]||0)+v}});return o};
+  const A=acc(S.hist),W=acc(S.hist.filter(inW)),nm=k=>kind==='m'?cap(k):exInfo(k).name;
+  const keys=[...new Set([...Object.keys(A).sort((a,b)=>A[b]-A[a]),...Object.keys(W),...(kind==='m'?(TRACK[g]||[]):[])])],col={};keys.forEach((k,i)=>col[k]=RANKC[i%RANKC.length]);
+  const sum=o=>Object.values(o).reduce((a,v)=>a+v,0),tA=sum(A),tW=sum(W),f=v=>kind==='c'?Math.round(v):fmtW(v);
+  const sl=(o,t)=>keys.filter(k=>o[k]>0).map(k=>({label:nm(k),value:o[k],val:f(o[k]),col:col[k],tip:`<b>${esc(nm(k))}</b><div>${f(o[k])} ${unit} · ${pct(o[k]/t)}</div>`}));
+  const pie=(o,t,cap2)=>`<div class="g2pie">${donut(t?sl(o,t):keys.map(k=>({label:nm(k),value:0,val:0,col:col[k],tip:''})),f(t),unit)}<span class="g2cap">${cap2}</span></div>`;
+  const wl=wkOff===0?'This week':wkOff===-1?'Last week':'Week of '+shortD(wkDays()[0]);
+  const leg=`<div class="g2leg"><div class="g2lr g2lh"><span></span><span></span><span>All time</span><span>${wkOff===0?'This week':wkOff===-1?'Last week':'That week'}</span></div>${keys.map(k=>`<div class="g2lr cat ${A[k]||W[k]?'':'dim'}" style="${catVars(col[k])}"><i></i><span class="n">${esc(nm(k))}</span><span class="v">${f(A[k]||0)}</span><span class="v">${f(W[k]||0)}</span></div>`).join('')||'<p class="hint">Nothing yet.</p>'}</div>`;
+  const W8=Array.from({length:8},(_,i)=>{const m=monOf(new Date());m.setDate(m.getDate()-(7-i)*7);return ymd(m)});
+  const b8=W8.map(w=>({w,parts:[{v:S.hist.filter(h=>weekOf(h.date)===w).reduce((a,h)=>a+val(h),0),col:GCOL[g]||'slate',label:unit}]}));
+  const bd=wkDays().map(w=>({w,parts:[{v:S.hist.filter(h=>h.date===w).reduce((a,h)=>a+val(h),0),col:GCOL[g]||'slate',label:unit}]}));
+  const ks=Object.keys(A).sort((a,b)=>A[b]-A[a]),dAll=new Set(S.hist.filter(h=>val(h)>0).map(h=>h.date)),dW=[...dAll].filter(d=>days.has(d)).length,last=[...dAll].sort().pop();
+  const lo=keys.slice().sort((a,b)=>(A[a]||0)-(A[b]||0))[0];
+  const tiles=[[ks[0]?esc(nm(ks[0])):'None',ks[0]?`${kind==='m'?'top muscle':'most done'} · ${pct(A[ks[0]]/tA)}`:(kind==='m'?'top muscle':'most done')],[lo&&tA?esc(nm(lo)):'None',lo&&tA?`least trained · ${pct((A[lo]||0)/tA)}`:'least trained'],[last?dayLabel(last):'Not yet','last trained'],[`${dAll.size} · ${dW}`,'days trained, all time · '+wl.toLowerCase()]];
+  return `<div class="card g2"><div class="lab">${esc(g)}</div><div class="g2top">${leg}${pie(A,tA,'All time')}${pie(W,tW,wl)}</div>
+   <div class="g2bars"><div class="lovc"><div class="chd"><div class="lab">${esc(g)} ${unit==='min'?'minutes':'sets'} per week, last 8 weeks</div></div>${weekBars(b8,unit)}</div><div class="lovc">${chartHead(g+(unit==='min'?' minutes':' sets')+' per day')}${weekBars(bd,unit)}</div></div>
+   <div class="ostat4">${tiles.map(tileHTML).join('')}</div></div>`+list}
+function weekBody(ids){const days=new Set(wkDays()),all=S.hist;S.hist=all.filter(h=>days.has(h.date));try{const Dw=groupData(ids);return (overallBody(Dw,true)).split('Not trained yet').join(wkOff===0?'Not trained this week':wkOff===-1?'Not trained last week':'Not trained that week')}finally{S.hist=all}}
 function overallBody(D,wk,noList){const H=S.hist;
   const catOfH=h=>{const c=catOfEx(h.exId);if(c)return c;const sp=getSp(h.splitId);return sp&&sp.cat||null};
   const AC=activeCats(),by={};AC.forEach(c=>by[c]={n:0,sets:0,dates:new Set(),ex:{}});let tot=0;
