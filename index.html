@@ -1659,20 +1659,61 @@ body.gtdragging,body.gtdragging *{cursor:grabbing!important}
 .g2{gap:18px}
 .g2top{display:grid;grid-template-columns:minmax(220px,1.1fr) minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center}
 .g2leg{display:flex;flex-direction:column;gap:4px;min-width:0}
-.g2lr{display:grid;grid-template-columns:14px minmax(0,170px) 76px 86px;justify-content:start;gap:12px;align-items:center;font-size:16px;padding:6px 6px;border-radius:6px}
+.g2lr{display:grid;grid-template-columns:14px minmax(0,170px) 76px 86px;justify-content:start;gap:12px;align-items:center;font-size:16px;padding:4px 6px;border-radius:6px}
 .g2lr i{width:14px;height:14px;border-radius:4px;background:var(--s)}
 .g2lr .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .g2lr .v{text-align:right;font-family:var(--mono);font-size:15px;color:var(--ink)}
 .g2lr.dim{opacity:.5}
 .g2lh span{white-space:nowrap}.g2lh{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding-bottom:2px}
 .g2lh span:nth-child(n+3){text-align:right}
-.g2pie{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.g2pie{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
 .g2pie .viz{display:block!important}.g2pie .lgd{display:none!important}
 .g2pie .pie{width:200px!important;height:200px!important;max-width:100%}
 .g2cap{font-size:12.5px;font-weight:600;color:var(--muted)}
 .g2bars{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;padding-top:14px;border-top:1px solid var(--line2)}
 .g2bars .bars{max-height:220px}
 @media (max-width:900px){.g2top{grid-template-columns:1fr 1fr}.g2leg{grid-column:1/-1}.g2bars{grid-template-columns:minmax(0,1fr)}}
+
+#p-ex.trfit .trm>.g2{flex:72 1 0;min-height:0;overflow:hidden;padding:16px 18px;gap:calc(2.5vh / var(--uz,1))}
+#p-ex.trfit .trm>.g2+.trlist{flex:28 1 0}
+#p-ex .g2+.trlist>*{zoom:.85}
+#p-ex .g2 .ostat4 .sb{padding:6px 14px}
+#p-ex .g2 .ostat4 .sb .v{font-size:18px!important;line-height:1.2}
+#p-ex .g2 .ostat4 .sb .k{font-size:13px!important}
+.g2top{grid-template-columns:auto auto auto!important;justify-content:space-around;gap:40px!important}
+#p-ex.trfit .g2top{flex:none}
+#p-ex.trfit .g2bars{flex:1 1 0;min-height:220px}
+#p-ex.trfit .g2pie{justify-content:center}
+
+#p-ex.trfit .g2pie .pie{width:clamp(130px,calc(18vh / var(--uz,1)),200px)!important;height:clamp(130px,calc(18vh / var(--uz,1)),200px)!important;max-height:none}
+#p-ex.trfit .g2bars .lovc{min-height:0;height:100%}
+#p-ex.trfit .g2bars .bars{flex:1 1 0;min-height:0;height:100%;max-height:none!important;width:100%}
+
+#p-ex .g2{padding:18px 3.3%!important}
+.g2top{grid-template-columns:1fr 1fr 1fr!important;justify-content:stretch!important;column-gap:3.4%!important;justify-items:center}
+.g2bars{column-gap:3.4%!important;grid-template-columns:1fr 1fr!important}
+.g2bars .lovc{display:flex;flex-direction:column;gap:8px;min-width:0}
+.g2bw{flex:1 1 0;min-height:140px;width:100%;position:relative}
+.g2bw>svg{position:absolute;inset:0;width:100%!important;height:100%!important;max-height:none!important}
+
+.g2hd{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.g2chips{display:flex;gap:16px;flex-wrap:wrap}
+.g2chip{display:inline-flex;align-items:center;gap:7px;font-size:14px;color:var(--ink)}
+.g2chip i{width:11px;height:11px;border-radius:3.5px;background:var(--s)}
+.g2chip.dim{opacity:.45}
+.g2panels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.g2p{border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0}
+.g2ph{display:flex;align-items:center;justify-content:space-between;min-height:28px}
+.g2ph .chd{display:contents}.g2ph .wnav span{display:none}
+.g2pt{font-size:15px;font-weight:600}
+.g2pi{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:stretch;flex:1 1 auto;min-height:0}
+.g2pi .g2pie{justify-content:center}
+.g2pc{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0}
+.g2pie .viz{display:block!important}.g2pie .lgd{display:none!important}
+.g2p .g2pie .pie{width:clamp(120px,calc(17vh / var(--uz,1)),190px)!important;height:clamp(120px,calc(17vh / var(--uz,1)),190px)!important}
+#p-ex.trfit .g2panels{flex:1 1 0;min-height:220px}
+#p-ex.trfit .g2p .g2pi{flex:1 1 0}
+@media (max-width:900px){.g2panels{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -2460,10 +2501,10 @@ function donut(slices,center,unit){const tot=slices.reduce((a,s)=>a+s.value,0);i
     lg+=`<div class="lgr cat" style="${catVars(s.col)}" data-tip="${tk}" data-hk="${hk}"><i></i><span class="n">${esc(s.label)}</span><span class="v">${s.val}</span><span class="p">${pct(fr)}</span></div>`;a0=a1});
   const mid=vid+'m';
   return `<div class="viz"><svg viewBox="0 0 160 160" class="pie${animPie?' anim':''}" role="img" aria-label="${esc(unit)} breakdown"><defs><mask id="${mid}" maskUnits="userSpaceOnUse" x="0" y="0" width="160" height="160"><circle cx="80" cy="80" r="60" fill="none" stroke="#fff" stroke-width="40" pathLength="100" stroke-dasharray="100 100" transform="rotate(-90 80 80)" class="pmask"/></mask></defs><g mask="url(#${mid})">${svg}</g><text x="80" y="80" text-anchor="middle" class="pc1">${center}</text><text x="80" y="98" text-anchor="middle" class="pc2">${esc(unit)}</text></svg><div class="lgd">${lg}</div></div>`}
-function weekBars(data,unit,Hh){Hh=Hh||220;const W=600,pl=34,pr=6,pt=12,pb=24,n=data.length,tot=data.map(d=>d.parts.reduce((a,p)=>a+p.v,0)),nice=niceMax(Math.max(1,...tot));
+function weekBars(data,unit,Hh,W0){Hh=Hh||220;const W=W0||600,pl=34,pr=6,pt=12,pb=24,n=data.length,tot=data.map(d=>d.parts.reduce((a,p)=>a+p.v,0)),nice=niceMax(Math.max(1,...tot));
   const bw=(W-pl-pr)/n,Y=v=>pt+(1-v/nice)*(Hh-pt-pb);let s=`<svg viewBox="0 0 ${W} ${Hh}" class="chart bars" role="img" aria-label="${esc(unit)} per ${n<=7?'day':'week'}">`;
   [0,nice/2,nice].forEach(v=>{s+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" class="cg"/><text x="${pl-6}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end" class="ct">${fmtW(v)}</text>`});
-  data.forEach((d,i)=>{let y0=Y(0);const x=pl+i*bw+bw*.2,w=bw*.6;
+  data.forEach((d,i)=>{let y0=Y(0);const x=pl+i*bw+bw*.2+Math.max(0,bw*.6-56)/2,w=Math.min(bw*.6,56);
     d.parts.filter(p=>p.v>0).forEach(p=>{const ht=Y(0)-Y(p.v);s+=`<rect x="${x.toFixed(1)}" y="${(y0-ht).toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(0,ht-.5).toFixed(1)}" rx="2.5" class="bs cat" style="${catVars(p.col)}"/>`;y0-=ht});
     const daily=n<=7,tip=`<b>${daily?dayLabel(d.w):'Week of '+shortD(d.w)}</b>`+(tot[i]?d.parts.filter(p=>p.v>0).map(p=>`<div class="tr cat" style="${catVars(p.col)}"><i></i><span>${esc(p.label)}</span><b>${fmtW(p.v)}</b></div>`).join('')+(d.parts.length>1?`<div class="tt">Total ${fmtW(tot[i])} ${esc(unit)}</div>`:''):`<div>No ${esc(unit)}</div>`)+(d.extra||'');
     s+=`<rect x="${(pl+i*bw).toFixed(1)}" y="${pt}" width="${bw.toFixed(1)}" height="${Hh-pt-pb}" class="bh" data-tip="${tipKey(tip)}"/>`;
@@ -2581,7 +2622,9 @@ function groupRow(g,D){const gd=D.G[g],has=D.groups.includes(g),n=gd.exs.length;
   const inner=`<span class="cdot cat" style="${catVars(GCOL[g])}"></span><span class="ln"><b>${g}</b><span class="hint">${n} exercise${n===1?'':'s'}</span></span><span class="lv"><b>${gd.dates.length}</b>days</span><span class="lv"><b>${val}</b>${unit}</span><span class="lv mh">${top?`<b style="font-size:17px">${esc(top)}</b>top`:''}</span><span class="lv mh lst">${gd.last?'Last trained '+lastLbl(gd.last):'Not trained yet'}</span>`;
   return has?`<button class="grw" data-act="trtab" data-t="${g}">${inner}${ic('chev')}</button>`:`<div class="grw off">${inner}<span></span></div>`}
 function mainBody(D,ids){return trTab==='overall'?overallBody(D,false):trTab==='week'?weekBody(ids):groupTab(trTab,D,ids)}
-let GB8=false;
+let GB8=false,G2B=null;
+function g2Fit(){if(!G2B)return;const z=ZF();document.querySelectorAll('#p-ex .g2bw').forEach(w=>{const r=w.getBoundingClientRect(),W=Math.round(r.width/z),H=Math.round(r.height/z);if(W<120||H<90)return;w.innerHTML=weekBars(G2B[+w.dataset.b],G2B[2],H,W)})}
+window.addEventListener('resize',()=>{clearTimeout(window._g2f);window._g2f=setTimeout(()=>{if(page===2&&document.querySelector('#p-ex .g2bw'))renderEx()},150)});
 function barDays(){if(!GB8)return wkDays();return Array.from({length:8},(_,i)=>{const m=monOf(new Date());m.setDate(m.getDate()-(7-i)*7);return ymd(m)})}
 function onBar(d,w){return GB8?weekOf(d)===w:d===w}
 function barHead(t){return GB8?`<div class="chd"><div class="lab">${esc(t.replace(' per day',' per week, last 8 weeks'))}</div></div>`:chartHead(t)}
@@ -2599,11 +2642,13 @@ function groupTab(g,D,ids){const cut=h=>{const i=h.lastIndexOf('<div class="card
   const W8=Array.from({length:8},(_,i)=>{const m=monOf(new Date());m.setDate(m.getDate()-(7-i)*7);return ymd(m)});
   const b8=W8.map(w=>({w,parts:[{v:S.hist.filter(h=>weekOf(h.date)===w).reduce((a,h)=>a+val(h),0),col:GCOL[g]||'slate',label:unit}]}));
   const bd=wkDays().map(w=>({w,parts:[{v:S.hist.filter(h=>h.date===w).reduce((a,h)=>a+val(h),0),col:GCOL[g]||'slate',label:unit}]}));
-  const ks=Object.keys(A).sort((a,b)=>A[b]-A[a]),dAll=new Set(S.hist.filter(h=>val(h)>0).map(h=>h.date)),dW=[...dAll].filter(d=>days.has(d)).length,last=[...dAll].sort().pop();
+  G2B=[b8,bd,unit];const ks=Object.keys(A).sort((a,b)=>A[b]-A[a]),dAll=new Set(S.hist.filter(h=>val(h)>0).map(h=>h.date)),dW=[...dAll].filter(d=>days.has(d)).length,last=[...dAll].sort().pop();
   const lo=keys.slice().sort((a,b)=>(A[a]||0)-(A[b]||0))[0];
   const tiles=[[ks[0]?esc(nm(ks[0])):'None',ks[0]?`${kind==='m'?'top muscle':'most done'} · ${pct(A[ks[0]]/tA)}`:(kind==='m'?'top muscle':'most done')],[lo&&tA?esc(nm(lo)):'None',lo&&tA?`least trained · ${pct((A[lo]||0)/tA)}`:'least trained'],[last?dayLabel(last):'Not yet','last trained'],[`${dAll.size} · ${dW}`,'days trained, all time · '+wl.toLowerCase()]];
-  return `<div class="card g2"><div class="lab">${esc(g)}</div><div class="g2top">${leg}${pie(A,tA,'All time')}${pie(W,tW,wl)}</div>
-   <div class="g2bars"><div class="lovc"><div class="chd"><div class="lab">${esc(g)} ${unit==='min'?'minutes':'sets'} per week, last 8 weeks</div></div>${weekBars(b8,unit)}</div><div class="lovc">${chartHead(g+(unit==='min'?' minutes':' sets')+' per day')}${weekBars(bd,unit)}</div></div>
+  const chips=`<div class="g2chips">${keys.map(k=>`<span class="g2chip cat ${A[k]||W[k]?'':'dim'}" style="${catVars(col[k])}"><i></i>${esc(nm(k))}</span>`).join('')}</div>`;
+  const un=unit==='min'?'minutes':'sets',pnl=(title,head,o,t,lb,b)=>`<div class="g2p"><div class="g2ph">${head}</div><div class="g2pi"><div class="g2pie">${donut(t?sl(o,t):keys.map(k=>({label:nm(k),value:0,val:0,col:col[k],tip:''})),f(t),unit)}</div><div class="g2pc"><div class="lab">${lb}</div><div class="g2bw" data-b="${b}">${weekBars(b?bd:b8,unit)}</div></div></div></div>`;
+  const wh=chartHead('').replace('<div class="lab"></div>',`<b class="g2pt">${wl}</b>`);
+  return `<div class="card g2"><div class="g2hd"><div class="lab">${esc(g)}</div>${chips}</div><div class="g2panels">${pnl('All time',`<b class="g2pt">All time</b>`,A,tA,un+' per week, last 8 weeks',0)}${pnl(wl,wh,W,tW,un+' per day',1)}</div>
    <div class="ostat4">${tiles.map(tileHTML).join('')}</div></div>`+list}
 function weekBody(ids){const days=new Set(wkDays()),all=S.hist;S.hist=all.filter(h=>days.has(h.date));try{const Dw=groupData(ids);return (overallBody(Dw,true)).split('Not trained yet').join(wkOff===0?'Not trained this week':wkOff===-1?'Not trained last week':'Not trained that week')}finally{S.hist=all}}
 function overallBody(D,wk,noList){const H=S.hist;
@@ -2697,7 +2742,7 @@ function renderEx(){syncCatCols();
   h+=`<datalist id="exlist">${rec.map(id=>`<option value="${esc(exInfo(id).name)}" label="Recently used · ${FMT[exInfo(id).fmt].side}"></option>`).join('')}${Object.entries(LIB).filter(([id])=>!recS.has(id)&&okEx(id)).map(([id,v])=>`<option value="${esc(v.name)}" label="${v.group} · ${FMT[v.fmt].side}"></option>`).join('')}${S.exlib.filter(x=>!recS.has(x.id)&&okEx(x.id)).map(x=>`<option value="${esc(x.name)}" label="Your exercise · ${FMT[exInfo(x.id).fmt].side}"></option>`).join('')}</datalist>`;
   h+=`<div class="trb"><div class="trm" id="tr-main">${trTab==='splits'?splitsBody():mainBody(D,ids)}</div>${ids.length?`<div class="card trlist" id="lt-res" hidden><div class="lab">Matching exercises</div>${ids.map(exRow).join('')}</div><p class="hint" id="lt-none" hidden>No exercises match that search.</p>`:''}</div>`;
   still(P,'tr|'+trTab);P.innerHTML=h;lastTab=trTab;initTabs(tsl);if(trTab==='splits'){masonry();spObserve()}if(animPie){const b=P.querySelectorAll('.trviz .bars');b.forEach(x=>x.classList.add('anim'))}animPie=false;
-  const nl=P.querySelector('#tr-main .trlist,#tr-main .trsc');if(nl&&st)nl.scrollTop=st;if(preB)boardFlip(preB);
+  const nl=P.querySelector('#tr-main .trlist,#tr-main .trsc');if(nl&&st)nl.scrollTop=st;if(P.querySelector('.g2bw'))g2Fit();if(preB)boardFlip(preB);
   const GV=$('gview');GV.hidden=true;GV.innerHTML='';gview=null;
   filterLt();
 }
