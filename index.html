@@ -1714,6 +1714,15 @@ body.gtdragging,body.gtdragging *{cursor:grabbing!important}
 #p-ex.trfit .g2panels{flex:1 1 0;min-height:220px}
 #p-ex.trfit .g2p .g2pi{flex:1 1 0}
 @media (max-width:900px){.g2panels{grid-template-columns:minmax(0,1fr)}}
+
+.wlbtn{align-self:flex-start;margin-top:2px}
+.wllg{display:inline-flex;align-items:center;gap:4px;color:var(--ok)!important;font-weight:600}.wllg svg{width:12px;height:12px}
+.wlf{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.wlfh{display:flex;align-items:center;gap:10px}.wlfh .lab{flex:1}
+.wlsec{display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:10px;background:var(--f)}
+.wlsec .exl.lg{grid-template-columns:20px minmax(0,1fr)!important;grid-template-areas:"ck ex" ". nf"!important;align-items:center;background:var(--surface);border-radius:8px;padding:6px 8px;row-gap:6px}
+.wlsec .exl.lg .exm{display:none}.wlsec .exn{font-size:13.5px}
+.wlff{display:flex;justify-content:flex-end;gap:8px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1997,7 +2006,7 @@ const B={
   return ['Edit block',`
   <div class="fld"><input class="inp big" id="f-title" placeholder="What is it" value="${esc(b.title)}" autocomplete="off"></div>
   <div class="fld"><span class="lab">Category</span>${catSeg(b.cat)}</div>
-  <div class="fld"><span class="lab">Tags</span>${S.splits.length?(()=>{const tg=bTags(b);return `<div class="seg">${S.splits.map(x=>`<button class="sg cat ${tg.includes(x.id)?'on':''}" style="${catVars(x.col)}" data-act="btag" data-id="${x.id}" aria-pressed="${tg.includes(x.id)}"><span class="sw"></span>${esc(x.name||'Untitled split')}</button>`).join('')}</div>${tg.length?'':''}`+tg.map(id=>{const sp=getSp(id),ex=sp.items.filter(i=>i.exId);return `<div class="splan cat" style="${catVars(sp.col)}"><div class="splan-h">${ic('dumbbell')}<b>${esc(sp.name||'Split')}</b><span>${ex.length} exercise${ex.length===1?'':'s'}</span></div>${ex.length?ex.map(i=>`<div class="splan-r"><span>${esc(exInfo(i.exId).name)}</span><span>${specOf(i)}</span></div>`).join(''):'<p class="hint">This tag has no exercises yet.</p>'}</div>`}).join('')+(tg.length?`<button class="lk" data-act="go" data-p="2" data-tab="splits" style="align-self:flex-start">Edit or log on Training</button>`:'')})():`<p class="hint">No tags yet.</p><div><button class="btn" data-act="go" data-p="2" data-tab="splits">${ic('dumbbell')}Go to Training</button></div>`}</div>
+  <div class="fld"><span class="lab">Tags</span>${S.splits.length?(()=>{const tg=bTags(b);return `<div class="seg">${S.splits.map(x=>`<button class="sg cat ${tg.includes(x.id)?'on':''}" style="${catVars(x.col)}" data-act="btag" data-id="${x.id}" aria-pressed="${tg.includes(x.id)}"><span class="sw"></span>${esc(x.name||'Untitled split')}</button>`).join('')}</div>${tg.length?'':''}`+tg.map(id=>{const sp=getSp(id),ex=sp.items.filter(i=>i.exId);return `<div class="splan cat" style="${catVars(sp.col)}"><div class="splan-h">${ic('dumbbell')}<b>${esc(sp.name||'Split')}</b>${wlLogged(b,id)?`<span class="wllg">${ic('check')}Logged ${esc(shortD(bDateOf(b)))}</span>`:`<span>${ex.length} exercise${ex.length===1?'':'s'}</span>`}</div>${ex.length?ex.map(i=>`<div class="splan-r"><span>${esc(exInfo(i.exId).name)}</span><span>${specOf(i)}</span></div>`).join(''):'<p class="hint">This tag has no exercises yet.</p>'}</div>`}).join('')+(tg.length?wlogHTML(b,tg):'')})():`<p class="hint">No tags yet.</p><div><button class="btn" data-act="go" data-p="2" data-tab="splits">${ic('dumbbell')}Go to Training</button></div>`}</div>
   <div class="fld"><span class="lab">Day</span><div class="seg">${order().map(d=>`<button class="sg ${b.d===d?'on':''}" data-act="setday" data-d="${d}">${DAYS[d]}</button>`).join('')}</div></div>
   <div class="fld"><span class="lab">Time</span><div class="row"><input class="inp grow" type="time" id="f-s" step="300" value="${toHM(b.s)}"><span class="hint">to</span><input class="inp grow" type="time" id="f-e" step="300" value="${toHM(b.e%1440)}"></div>
    <p class="err" id="t-err" hidden></p>
@@ -2069,6 +2078,23 @@ const B={
 function armed(btn,label){if(btn.dataset.armed){return true}btn.dataset.armed='1';btn.classList.add('armed');const o=btn.innerHTML;btn._ao=o;btn.innerHTML=label;setTimeout(()=>disarm(btn),4000);return false}
 function disarm(btn){if(btn.isConnected&&btn.dataset.armed){delete btn.dataset.armed;btn.classList.remove('armed');btn.innerHTML=btn._ao}}
 document.addEventListener('pointerdown',e=>{document.querySelectorAll('[data-armed]').forEach(b=>{if(!b.contains(e.target))disarm(b)})},true);
+let wlDraft=null;
+function bDateOf(b){const m=ymdP(b.wk||viewWk);m.setDate(m.getDate()+(b.d||0));return ymd(m)}
+function wlLogged(b,sid){const d=bDateOf(b);return S.hist.some(h=>h.date===d&&h.splitId===sid)}
+function wlOpen(b){const tg=bTags(b);wlDraft={bid:b.id,date:bDateOf(b),rows:[]};tg.forEach(sid=>{const sp=getSp(sid);if(sp)sp.items.filter(i=>i.exId).forEach(i=>wlDraft.rows.push({sid,exId:i.exId,on:true,sets:i.sets??'',reps:i.reps??'',w:i.w??'',t:i.t??'',d:i.d??''}))})}
+function wlogHTML(b,tg){const any=tg.some(id=>wlLogged(b,id));
+  if(!wlDraft||wlDraft.bid!==b.id)return `<button class="btn wlbtn" data-act="wlopen">${ic('check')}${any?'Log again':'Log workout'}</button>`;
+  let h=`<div class="wlf"><div class="wlfh"><span class="lab">Log workout</span><input class="inpd" type="date" data-f="wlgdate" value="${wlDraft.date}" aria-label="Session date"></div>`;
+  tg.forEach(sid=>{const sp=getSp(sid);if(!sp)return;const rows=wlDraft.rows.map((r,i)=>[r,i]).filter(([r])=>r.sid===sid);h+=`<div class="wlsec cat" style="${catVars(sp.col)}"><div class="splan-h">${ic('dumbbell')}<b>${esc(sp.name||'Split')}</b></div>`;
+    h+=rows.length?rows.map(([r,i])=>{const f=exInfo(r.exId).fmt;return `<div class="exl lg ${r.on?'':'off'}"><button class="ck ${r.on?'on':''}" data-act="wlck" data-i="${i}" aria-label="Include">${ic('check')}</button><div class="exc"><span class="exn">${esc(exInfo(r.exId).name)}</span><span class="exm">${esc(FMT[f].side)}</span></div>${fieldsHTML(f,r,`data-f="wlgn" data-i="${i}"`)}</div>`}).join(''):'<p class="hint">No exercises yet.</p>';h+='</div>'});
+  return h+`<div class="wlff"><button class="btn" data-act="wlcancel">Cancel</button><button class="btn pri" data-act="wlsave">${ic('check')}Save</button></div></div>`}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-act^=wl]');if(!t||!t.closest('#drawer,.drawer,.sheet,aside'))return;const a=t.dataset.act,b=modeArg&&getB(modeArg.id);if(!b)return;
+  if(a==='wlopen'){wlOpen(b);refreshDrawer()}
+  else if(a==='wlcancel'){wlDraft=null;refreshDrawer()}
+  else if(a==='wlck'){const r=wlDraft&&wlDraft.rows[+t.dataset.i];if(r){r.on=!r.on;refreshDrawer()}}
+  else if(a==='wlsave'){const rows=wlDraft.rows.filter(r=>r.on);if(!rows.length){toast('Tick at least one exercise',false);return}pushUndo();const ts=Date.now(),d=wlDraft.date||bDateOf(b);rows.forEach(r=>S.hist.push({id:uid(),date:d,ts,exId:r.exId,splitId:r.sid,sets:+r.sets||0,reps:+r.reps||0,w:+r.w||0,t:+r.t||0,d:+r.d||0}));
+    const n=new Set(rows.map(r=>r.sid)).size;wlDraft=null;save();refreshDrawer();renderEx();renderGoals();toast(`${n} split${n===1?'':'s'} logged · ${rows.length} exercise${rows.length===1?'':'s'}`)}});
+document.addEventListener('input',e=>{const t=e.target,f=t.dataset&&t.dataset.f;if(!wlDraft)return;if(f==='wlgn'){const r=wlDraft.rows[+t.dataset.i];if(r)r[t.dataset.k]=t.value}else if(f==='wlgdate')wlDraft.date=t.value});
 function editB(fn){const b=getB(modeArg.id);if(!b)return;if(!editPushed){pushUndo();editPushed=true}fn(b);save();renderGrid();renderChips();renderNow()}
 function newBlock(d,s,e){const id=uid();const b={id,d,s,e,wk:viewWk,title:'',cat:S.focus||(S.cats[0]?.id??null),loc:'',notes:''};TT().blocks.push(b);return b}
 function nextDay(d){const v=vdays(),i=v.indexOf(d);return v[(i+1)%v.length]}
