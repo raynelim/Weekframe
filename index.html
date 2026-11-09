@@ -3072,7 +3072,7 @@ const actLevel=n=>n>=7?[1.9,'very hard']:n>=5?[1.725,'very active']:n>=3?[1.55,'
 const fmtK=n=>Math.round(n).toLocaleString();
 let pfD={h:'',w:'',d:''};
 function pfLatest(k){const L=S.body.slice().sort((a,b)=>b.date.localeCompare(a.date)).find(e=>+e[k]);return L?+L[k]:''}
-function pfReset(){pfD={h:pfLatest('h')||S.profile.h||'',w:pfLatest('w')||S.profile.w||'',d:ymd(new Date())}}
+function pfReset(){const d=ymd(new Date()),e=S.body.find(x=>x.date===d);pfD={h:e&&+e.h?e.h:'',w:e&&+e.w?e.w:'',d,day:d}}
 function pfSync(){const P=S.profile;P.h=pfLatest('h')||P.h||'';P.w=pfLatest('w')||P.w||'';if(+P.w)S.set.bw=+P.w}
 function pfHist(){const L=S.body.slice().sort((a,b)=>b.date.localeCompare(a.date));if(!L.length)return `<p class="hint" style="margin:0">Log your weight and height to start tracking.</p>`;
   return `<div class="pfhist"><div class="pfhr pfhh"><span>Date</span><span>Weight</span><span>Height</span><span>BMI</span><span></span></div>${L.map(e=>{const b=bmiOf(+e.h,+e.w);return `<div class="pfhr ${e.date===pfD.d?'cur':''}"><span>${ymdP(e.date).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})}</span><span class="mo">${+e.w?fmtW(+e.w)+' kg':'-'}</span><span class="mo">${+e.h?fmtW(+e.h)+' cm':'-'}</span><span class="mo">${b?fmtW(b):'-'}</span><span class="pfha"><button class="ib" data-act="pfedit" data-d="${e.date}" aria-label="Edit entry" title="Edit">${ic('edit')}</button><button class="ib qdelb" data-act="pfdel" data-d="${e.date}" aria-label="Delete entry" title="Delete">${ic('trash')}</button></span></div>`}).join('')}</div>`}
@@ -3109,7 +3109,7 @@ function lineChart(pts,unit,lab,bands){const W=900,Hh=240,pl=46,pr=18,pt=16,pb=3
 function renderProf(){const H=$('p-prof');if(!H)return;const keep=TIPS;TIPS=[];
   const P=S.profile,std=BMIS[P.std]?P.std:'who',B=BMIS[std],wk=profWeek(),wks=new Set(wk),age=+P.age,h=+P.h,w=+P.w,bmi=bmiOf(h,w),ci=bmi?bmiCat(bmi,std):-1;
   const wlab=profOff===0?'This week':profOff===-1?'Last week':profOff===1?'Next week':'Week of '+shortD(wk[0]);
-  if(!pfD.d)pfReset();const lfld=(k,lab,unit,step)=>`<label class="pfx"><span class="k">${lab}</span><span class="pfv"><input class="pfi" type="text" inputmode="decimal" data-f="pfl" data-k="${k}" value="${pfD[k]}" placeholder="Add" autocomplete="off" aria-label="${lab}"><small>${unit}</small></span></label>`;
+  if(pfD.day!==ymd(new Date()))pfReset();const lfld=(k,lab,unit,step)=>`<label class="pfx"><span class="k">${lab}</span><span class="pfv"><input class="pfi" type="text" inputmode="decimal" data-f="pfl" data-k="${k}" value="${pfD[k]}" placeholder="${pfLatest(k)||'Add'}" autocomplete="off" aria-label="${lab}"><small>${unit}</small></span></label>`;
   const fld=(k,lab,unit,min,max,step)=>`<label class="pfx"><span class="k">${lab}</span><span class="pfv"><input class="pfi" type="number" inputmode="decimal" data-f="pf" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${P[k]===''||P[k]==null?'':P[k]}" placeholder="Add" aria-label="${lab}"><small>${unit}</small></span></label>`;
   // estimates
   const HW=wk.length?S.hist.filter(x=>wks.has(x.date)):[],tdays=new Set(HW.map(x=>x.date)).size,act=actLevel(tdays);
@@ -3136,7 +3136,7 @@ function renderProf(){const H=$('p-prof');if(!H)return;const keep=TIPS;TIPS=[];
   const dl=(a,b)=>{const d=a-b;return (d>0?'+':'')+fmtW(d)};
   const u=ser[1]?`<small> ${ser[1]}</small>`:'';
   const btiles=[[last?fmtW(last.v)+u:'None','latest '+ser[0].toLowerCase()],[inW&&before?dl(inW.v,before.v)+u:'None',`change ${profOff===0?'this week':'that week'}`],[last&&first&&pts.length>1?dl(last.v,first.v)+u:'None','since first entry'],[S.body.length,'entries logged']];
-  h1+=`<div class="card pfbody"><div class="chd"><div class="lab">Body over time</div><div class="seg sm">${[['w','Weight'],['h','Height'],['b','BMI']].map(([k,l])=>`<button class="sg ${profSer===k?'on':''}" data-act="pfser" data-v="${k}">${l}</button>`).join('')}</div></div>${lineChart(pts,ser[1],ser[0],ser[2])}<div class="ostat4">${btiles.map(tileHTML).join('')}</div>${pfHist()}</div></div>`;
+  h1+=`<div class="card pfbody"><div class="chd"><div class="lab">Body over time</div><div class="seg sm">${[['w','Weight'],['h','Height'],['b','BMI']].map(([k,l])=>`<button class="sg ${profSer===k?'on':''}" data-act="pfser" data-v="${k}">${l}</button>`).join('')}</div></div>${lineChart(pts,ser[1],ser[0],ser[2])}<div class="ostat4">${btiles.map(tileHTML).join('')}</div></div></div>`;
   // week plan summary
   const BL=WB(wk[0]),cm={},per=wk.map(()=>({}));BL.forEach(b=>{const m=b.e-b.s,k=getC(b.cat)?b.cat:'_';cm[k]=(cm[k]||0)+m;per[b.d][k]=(per[b.d][k]||0)+m});
   const cn=k=>getC(k)?getC(k).name:'No category',cc=k=>getC(k)?getC(k).col:'slate',tot=Object.values(cm).reduce((a,v)=>a+v,0);
