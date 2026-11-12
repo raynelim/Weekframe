@@ -1737,9 +1737,8 @@ body.gtdragging,body.gtdragging *{cursor:grabbing!important}
 .mysu-c b{font-size:17px}.mysu-c p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
 .mysu-f{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
 
-.sglist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;margin-bottom:22px;align-items:start}
-@media (max-width:900px){.sglist{grid-template-columns:minmax(0,1fr)}}
-.sgcard{border:1px solid var(--line);border-radius:14px;background:var(--surface);display:flex;flex-direction:column;transition:box-shadow .15s,background .15s;min-width:0}
+.sgboard{margin-bottom:22px}
+.sgcard{border:1px solid var(--line);border-left:4px solid var(--s);border-radius:14px;background:var(--surface);display:flex;flex-direction:column;transition:box-shadow .15s,background .15s;min-width:0}
 .sgcard>.sgh{min-height:62px;padding:12px 16px 12px 16px;border-radius:14px;cursor:pointer}
 .sgcard.ed>.sgh{cursor:default}
 .sgcard>.sgh:hover{background:var(--sunk)}.sgcard.ed>.sgh:hover{background:transparent}
@@ -2664,13 +2663,13 @@ function spDetail(sp){const ex=sp.items.filter(i=>i.exId),st=spStats(sp),sets=ex
 let sgEdit=null,sgPick=null;
 function sgSection(){const G=S.sgroups||[];
   const shut=S.set.sgShut||[];
-  const card=g=>{const ed=sgEdit===g.id,pk=sgPick===g.id,open=ed||!shut.includes(g.id),n=g.splits.map(getSp).filter(Boolean).length;return `<div class="sgcard cat ${ed?'ed':''} ${open?'open':''}" data-sid="${g.id}" data-gid="${g.id}" style="${catVars(g.col)}">
+  const card=(g,o)=>{const ed=sgEdit===g.id,pk=sgPick===g.id,open=ed||!shut.includes(g.id),n=g.splits.map(getSp).filter(Boolean).length;return `<div class="sgcard cat ${ed?'ed':''} ${open?'open':''}" data-sid="${g.id}" data-gid="${g.id}" style="order:${o||0};${catVars(g.col)}">
    <div class="sgh" ${ed?'':`data-act="sgfold" data-id="${g.id}" role="button" tabindex="0" aria-expanded="${open}"`}><span class="sgsw"></span>${ed?`<input class="inp sgni" id="sgn-${g.id}" data-f="sgname" data-id="${g.id}" value="${esc(g.name)}" placeholder="Group name, like Push" maxlength="30" autocomplete="off">`:`<b class="sgn">${esc(g.name||'Group')}</b>${open?'':`<span class="sgct">${n} split${n===1?'':'s'}</span>`}`}<span class="sp"></span>
     ${ed?`<button class="btn sm pri" data-act="sgdone">${ic('check')}Done</button>`:open?`<button class="btn sm" data-act="sgpick" data-id="${g.id}" aria-expanded="${pk}">${ic('plus')}Add split</button><button class="ib" data-act="sgedit" data-id="${g.id}" aria-label="Edit group" title="Rename or recolour">${ic('edit')}</button><button class="ib qdelb" data-act="sgdel" data-id="${g.id}" aria-label="Delete group" title="Delete">${ic('trash')}</button>`:''}${ed?'':ic('chev')}</div>
    ${open?`<div class="sgb">${ed?`<div class="gsw">${PKEYS.map(k=>`<button class="pd cat ${k===g.col?'on':''}" style="${catVars(k)}" data-act="sgcol" data-id="${g.id}" data-k="${k}" aria-label="${cap(k)}" title="${cap(k)}"></button>`).join('')}</div>`:''}
    <div class="sgchips" data-sort="sgsplits" data-key="${g.id}" data-whole="1">${g.splits.map(getSp).filter(Boolean).map(sp=>`<span class="sgchip cat" data-sid="${sp.id}" style="${catVars(sp.col)}"><span class="sgsw"></span>${esc(sp.name||'Split')}<button class="gtcx" data-act="sgrm" data-g="${g.id}" data-id="${sp.id}" aria-label="Remove ${esc(sp.name||'split')} from group">${ic('x')}</button></span>`).join('')||`<span class="sgph">Drag splits here, or use Add split</span>`}</div>
    ${pk?`<div class="sgpick">${S.splits.map(sp=>{const on=g.splits.includes(sp.id);return `<button class="sg cat ${on?'on':''}" style="${catVars(sp.col)}" data-act="sgtog" data-g="${g.id}" data-id="${sp.id}" aria-pressed="${on}"><span class="sw"></span>${esc(sp.name||'Split')}</button>`}).join('')||'<span class="hint">No splits yet.</span>'}</div>`:''}</div>`:''}</div>`};
-  return `<div class="sec" style="margin:0 0 14px"><h2>Groups</h2><button class="btn pri" data-act="sgnew">${ic('plus')}New group</button></div>${G.length?`<div class="sglist" data-sort="sgroups" data-whole="1">${G.map(card).join('')}</div>`:''}`}
+  return `<div class="sec" style="margin:0 0 14px"><h2>Groups</h2><button class="btn pri" data-act="sgnew">${ic('plus')}New group</button></div>${G.length?(()=>{const cols=[[],[]];G.forEach(g=>cols[g.side===1?1:0].push(g));return `<div class="spboard sgboard">${cols.map((c,ci)=>`<div class="spcol" data-sort="sgroups" data-key="${ci}" data-whole="1">${c.map((g,ri)=>card(g,ri*2+ci)).join('')}</div>`).join('')}</div>`})():''}`}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-act^=sg]');if(!t)return;const a=t.dataset.act;if(!['sgnew','sgedit','sgdone','sgdel','sgpick','sgtog','sgrm','sgcol','sgfold'].includes(a))return;const g=getSG(t.dataset.g||t.dataset.id);
   const focusName=id=>setTimeout(()=>{const f=$('sgn-'+id);if(f){f.focus();f.select()}},30);
   if(a==='sgnew'){pushUndo();const ng={id:uid(),name:'',col:nextCol([...S.sgroups.map(x=>x.col),...S.splits.map(x=>x.col)]),splits:[]};S.sgroups.push(ng);save();sgEdit=ng.id;sgPick=null;renderEx();focusName(ng.id)}
@@ -2692,8 +2691,8 @@ function splitsBody(){migSplits();const draft=spEdit&&spEdit.isNew?spEdit.draft:
   const cols=[[],[]];list.forEach(sp=>cols[sp.side===1?1:0].push(sp));
   return h+`<div class="spboard ${spEdit?'focusing':''}">${cols.map((col,ci)=>`<div class="spcol" data-sort="splitcol" data-key="${ci}" data-whole="1">${col.map((sp,ri)=>splitCard(sp).replace('style="',`style="order:${ri*2+ci};`)).join('')}</div>`).join('')}</div></div>`}
 /* board animation: cards keep their column, expanding pushes only what is below */
-function boardRects(){const m={};document.querySelectorAll('#p-ex .spboard [data-sid],#p-ex .spboard [data-sec]').forEach(el=>{m[(el.dataset.sid||'s:'+el.dataset.sec)]=el.getBoundingClientRect()});return m}
-function boardFlip(pre){if(!motionOK())return;const z=ZF();document.querySelectorAll('#p-ex .spboard [data-sid],#p-ex .spboard [data-sec]').forEach(el=>{const a=pre[el.dataset.sid||'s:'+el.dataset.sec];if(!a)return;const b=el.getBoundingClientRect(),dy=(a.top-b.top)/z;if(Math.abs(dy)>1)el.animate([{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'})})}
+function boardRects(){const m={};document.querySelectorAll('#p-ex .spboard:not(.sgboard) [data-sid],#p-ex .spboard [data-sec]').forEach(el=>{m[(el.dataset.sid||'s:'+el.dataset.sec)]=el.getBoundingClientRect()});return m}
+function boardFlip(pre){if(!motionOK())return;const z=ZF();document.querySelectorAll('#p-ex .spboard:not(.sgboard) [data-sid],#p-ex .spboard [data-sec]').forEach(el=>{const a=pre[el.dataset.sid||'s:'+el.dataset.sec];if(!a)return;const b=el.getBoundingClientRect(),dy=(a.top-b.top)/z;if(Math.abs(dy)>1)el.animate([{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'})})}
 function focusSp(id){setTimeout(()=>{const c=document.querySelector(`#p-ex .spboard .scard[data-sid="${id}"]`);if(!c)return;c.scrollIntoView({block:'center',behavior:motionOK()?'smooth':'auto'});if(motionOK())c.animate([{transform:'scale(.97)',boxShadow:'0 0 0 0 transparent'},{transform:'none'}],{duration:340,easing:'cubic-bezier(.2,.8,.2,1)'})},40)}
 /* category picker for new splits */
 let cpop=null;
@@ -3382,7 +3381,7 @@ const SORTS={
  splits:{a:()=>S.splits,r:()=>renderEx()},
  splitcol:{a:()=>S.splits,r:()=>renderEx(),board:true},
  tabs:{apply:order=>{S.set.tabOrder=order;save();renderEx()}},
- sgroups:{a:()=>S.sgroups,r:()=>renderEx()},
+ sgroups:{a:()=>S.sgroups,r:()=>renderEx(),board:true},
  sgsplits:{apply:(order,key)=>{const g=getSG(key);if(!g)return;if(order.join()===g.splits.join())return;pushUndo();g.splits=order;save();renderEx();renderGrid()}},
  spitems:{a:k=>spEdit&&spEdit.draft.id===k?spEdit.draft.items:null,r:()=>renderEx(),draft:true}};
 let srt=null,sortedAt=0;
@@ -3402,7 +3401,7 @@ function srtFollow(e){const it=srt.it,z=ZF();it.style.transform='none';const r=i
 document.addEventListener('pointermove',e=>{if(!srt||e.pointerId!==srt.id)return;
   if(!srt.on){const d=Math.hypot(e.clientX-srt.x0,e.clientY-srt.y0);if(srt.hold){if(d>8){clearTimeout(srt.t);srt=null}return}if(d<6&&!srt.ready)return;if(d<3)return;srt.on=true;srt.it.classList.remove('srt-ready');srt.it.classList.add('sorting');document.body.classList.add('is-sorting');hideHov&&hideHov();ctip.hidden=true;try{getSelection().removeAllRanges()}catch(x){}}
   e.preventDefault();const it=srt.it,box=srt.box;requestAnimationFrame(()=>{if(srt&&srt.it===it)srtFollow(e)});
-  if(box.dataset.sort==='splitcol'){const el=document.elementFromPoint(e.clientX,e.clientY),gc=el&&el.closest('.sgcard');document.querySelectorAll('.sgcard.over').forEach(x=>x!==gc&&x.classList.remove('over'));if(gc){gc.classList.add('over');srt.grp=gc.dataset.gid;return}if(srt.grp)srt.grp=null;const cols=[...box.parentElement.children].filter(c=>c.classList.contains('spcol'));
+  if(SORTS[box.dataset.sort].board){const el=box.dataset.sort==='splitcol'&&document.elementFromPoint(e.clientX,e.clientY),gc=el&&el.closest('.sgcard');document.querySelectorAll('.sgcard.over').forEach(x=>x!==gc&&x.classList.remove('over'));if(gc){gc.classList.add('over');srt.grp=gc.dataset.gid;return}if(srt.grp)srt.grp=null;const cols=[...box.parentElement.children].filter(c=>c.classList.contains('spcol'));
     if(getComputedStyle(box).display==='contents'){const bd=box.parentElement,all=[...bd.querySelectorAll(':scope>.spcol>[data-sid]')],tg=all.find(c=>{if(c===it)return false;const r=c.getBoundingClientRect();return e.clientY>=r.top&&e.clientY<=r.bottom});
       if(!tg){srt.lock=null;return}if(tg===srt.lock)return;const r=tg.getBoundingClientRect(),ri=it.getBoundingClientRect();it.style.transform='none';const ri0=it.getBoundingClientRect();const after=r.top>ri0.top;
       if(after?e.clientY<r.top+r.height/2:e.clientY>r.top+r.height/2)return;
