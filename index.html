@@ -483,7 +483,7 @@ select.num.exs{font-family:var(--font);text-align:left;padding:0 8px;cursor:poin
 .lgr:hover,.lgr.on{background:var(--sunk)}
 .lgr i{width:10px;height:10px;border-radius:3px;background:var(--s)}
 .lgr .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lgr .v,.lgr .p{font-family:var(--mono);font-size:11.5px;font-variant-numeric:tabular-nums;text-align:right}
+.lgr .v,.lgr .p{font-family:inherit;font-size:12px;font-variant-numeric:tabular-nums;text-align:right}
 .lgr .v{color:var(--muted)}
 .viz.hl .sl:not(.on){opacity:.28}
 .viz.hl .lgr:not(.on){opacity:.45}
@@ -1022,9 +1022,12 @@ input.num.exs{font-size:15px}
 [data-sid]:hover>.grip,[data-sid]:hover>.row>.grip,[data-sid]:hover>.shd>.grip,.grip:focus-visible{opacity:1}
 .grip:hover{color:var(--ink);background:var(--sunk)}
 @media (hover:none){.grip{opacity:.8}}
-.sorting{opacity:.55;position:relative;z-index:2}
+.sorting{position:relative;z-index:30;pointer-events:none;box-shadow:0 14px 34px rgba(20,20,15,.18),0 2px 6px rgba(20,20,15,.08)!important;transition:none;will-change:transform}
+.sorting.srt-drop{box-shadow:0 2px 6px rgba(20,20,15,.06)!important}
+.srt-ready{transform:scale(1.02);transition:transform .15s;box-shadow:0 8px 22px rgba(20,20,15,.14)}
+[data-whole]>[data-sid]{cursor:grab;-webkit-touch-callout:none}
 .sorting .grip{cursor:grabbing}
-.chip.sorting{outline:2px dashed var(--line);outline-offset:2px}
+
 body.is-sorting,body.is-sorting *{cursor:grabbing!important;user-select:none!important}
 .scard .shd>.grip{margin-left:-6px}
 .exls{display:flex;flex-direction:column;gap:inherit}
@@ -1041,7 +1044,7 @@ body.is-sorting,body.is-sorting *{cursor:grabbing!important;user-select:none!imp
 
 /* ---------- profile ---------- */
 #p-prof{display:flex;flex-direction:column;gap:16px;padding-bottom:28px}
-.pfh{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.pfh{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .pfh h1{margin:0;font-size:28px;font-weight:600;letter-spacing:-.025em;line-height:1.15}
 .pfh p{margin:4px 0 0}
 .pfwk{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px}
@@ -1087,7 +1090,7 @@ body.is-sorting,body.is-sorting *{cursor:grabbing!important;user-select:none!imp
 .pfline{flex:none;min-height:200px}
 .chart .band{fill:var(--s);opacity:.1}
 .pfline .cl.pfdraw{stroke-dasharray:1;stroke-dashoffset:1;animation:linedraw .9s cubic-bezier(.45,0,.2,1) forwards .1s}
-@keyframes linedraw{to{stroke-dashoffset:0}}
+@keyframes linedraw{99%{stroke-dashoffset:0;stroke-dasharray:1}100%{stroke-dashoffset:0;stroke-dasharray:none}}
 .pfsec{display:flex;align-items:baseline;gap:10px;margin:6px 0 -4px}
 .pfsec h2{margin:0;font-size:18px;font-weight:600;letter-spacing:-.01em}
 #p-prof .trviz{padding:18px 20px}
@@ -1570,7 +1573,10 @@ button.spsh:hover{background:var(--sunk)}
 .logwk{gap:6px}.logwk svg{width:15px;height:15px}
 .logwk.done{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 35%,var(--line))}
 .logwk:disabled{opacity:.5;cursor:default}
-@media (max-width:760px){.cgl.cex{font-size:0;height:auto;padding:0}.cgl.cex i{width:6px;height:6px}.logwk .lbl{display:none}}
+@media (max-width:760px){.cgl.cex{font-size:0;height:auto;padding:0}.cgl.cex i{width:6px;height:6px}
+ .wbar{row-gap:10px}.wbar .nn{order:3;width:100%}
+ .wbar .logwk,.wbar #selbtn,.wbar [data-mode=stats]{order:4;flex:1 1 0;min-width:0;margin-left:0!important;height:36px;justify-content:center}
+ .wbar #selbtn,.wbar [data-mode=stats]{border:1px solid var(--line);border-radius:10px;background:var(--surface)}}
 
 .still,.still *{animation:none!important}
 
@@ -1731,18 +1737,29 @@ body.gtdragging,body.gtdragging *{cursor:grabbing!important}
 .mysu-c b{font-size:17px}.mysu-c p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
 .mysu-f{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
 
-.sglist{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:22px}
-.sgcard{border:1px solid var(--line);border-left:4px solid var(--s);border-radius:12px;background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s,background .15s}
+.sglist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;margin-bottom:22px;align-items:start}
+@media (max-width:900px){.sglist{grid-template-columns:minmax(0,1fr)}}
+.sgcard{border:1px solid var(--line);border-radius:14px;background:var(--surface);display:flex;flex-direction:column;transition:box-shadow .15s,background .15s;min-width:0}
+.sgcard>.sgh{min-height:62px;padding:12px 16px 12px 16px;border-radius:14px;cursor:pointer}
+.sgcard.ed>.sgh{cursor:default}
+.sgcard>.sgh:hover{background:var(--sunk)}.sgcard.ed>.sgh:hover{background:transparent}
+.sgcard.open>.sgh{border-radius:14px 14px 0 0;border-bottom:1px solid var(--line2)}
+.sgh>svg{width:16px;height:16px;color:var(--muted);transition:transform .2s;flex:none}
+.sgcard.open .sgh>svg{transform:rotate(180deg)}
+.sgcard .sgh .sgsw{width:12px;height:12px;border-radius:4px}
+.sgcard .sgn{font-size:17.5px}
+.sgct{font-size:13px;color:var(--muted);white-space:nowrap}
+.sgb{display:flex;flex-direction:column;gap:10px;padding:12px 16px 14px}
 .sgcard.over{box-shadow:0 0 0 2px var(--s);background:color-mix(in srgb,var(--s) 8%,var(--surface))}
 .sgh{display:flex;align-items:center;gap:8px;min-width:0}
-.sgh .sp{flex:1}.sgn{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sgh .sp{flex:1}.sgn{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sgni{flex:1;min-width:0;height:34px}
 .sgsw{width:10px;height:10px;border-radius:3px;background:var(--s);flex:none}
 .sgchips{display:flex;flex-wrap:wrap;gap:6px;min-height:30px;align-items:center}
 .sgchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 4px 0 10px;border-radius:999px;background:color-mix(in srgb,var(--s) 16%,transparent);color:var(--t);font-size:13px;font-weight:500;cursor:grab;user-select:none;touch-action:none}
 .sgph{font-size:13px;color:var(--faint)}
 .sgpick{display:flex;flex-wrap:wrap;gap:6px;padding-top:8px;border-top:1px solid var(--line2)}
-.spcol>[data-sid].sorting{opacity:.55}
+
 .btag.grp{font-weight:600}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -2459,7 +2476,7 @@ window.addEventListener('hashchange',()=>{const i=PN.indexOf(location.hash.slice
 window.addEventListener('resize',placeInd);
 let sw=null,swipedAt=0;
 pager.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;if(e.target.closest('.gw,input,textarea,select,[data-grip],.qed'))return;sw={x0:e.clientX,y0:e.clientY,on:false,dx:0}});
-pager.addEventListener('pointermove',e=>{if(!sw)return;let dx=e.clientX-sw.x0;const dy=e.clientY-sw.y0;
+pager.addEventListener('pointermove',e=>{if(!sw)return;if(srt&&(srt.ready||srt.on)){sw=null;return}let dx=e.clientX-sw.x0;const dy=e.clientY-sw.y0;
   if(!sw.on){if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*1.3){sw.on=true;track.style.transition='none'}else if(Math.abs(dy)>12){sw=null;return}else return}
   if((page===0&&dx>0)||(page===4&&dx<0))dx*=.3;sw.dx=dx;track.style.transform=`translateX(calc(${-page*100}% + ${dx/ZF()}px))`});
 const swEnd=()=>{if(!sw)return;const s=sw;sw=null;if(!s.on)return;swipedAt=Date.now();track.style.transition='';go(s.dx<-60?page+1:s.dx>60?page-1:page)};
@@ -2646,16 +2663,18 @@ function spDetail(sp){const ex=sp.items.filter(i=>i.exId),st=spStats(sp),sets=ex
    <div class="hv-r">${ic('check')}<span>${st.cnt?`Last done <b>${dayLabel(st.last).toLowerCase()}</b> · ${st.cnt} session${st.cnt===1?'':'s'}`:'Not logged yet'}</span></div>`}
 let sgEdit=null,sgPick=null;
 function sgSection(){const G=S.sgroups||[];
-  const card=g=>{const ed=sgEdit===g.id,pk=sgPick===g.id;return `<div class="sgcard cat ${ed?'ed':''}" data-sid="${g.id}" data-gid="${g.id}" style="${catVars(g.col)}">
-   <div class="sgh"><span class="grip" data-grip title="Drag to reorder" aria-hidden="true">${ic('grip')}</span><span class="sgsw"></span>${ed?`<input class="inp sgni" id="sgn-${g.id}" data-f="sgname" data-id="${g.id}" value="${esc(g.name)}" placeholder="Group name, like Push" maxlength="30" autocomplete="off">`:`<b class="sgn">${esc(g.name||'Group')}</b>`}<span class="sp"></span>
-    ${ed?`<button class="btn sm pri" data-act="sgdone">${ic('check')}Done</button>`:`<button class="btn sm" data-act="sgpick" data-id="${g.id}" aria-expanded="${pk}">${ic('plus')}Add split</button><button class="ib" data-act="sgedit" data-id="${g.id}" aria-label="Edit group" title="Rename or recolour">${ic('edit')}</button><button class="ib qdelb" data-act="sgdel" data-id="${g.id}" aria-label="Delete group" title="Delete">${ic('trash')}</button>`}</div>
-   ${ed?`<div class="gsw">${PKEYS.map(k=>`<button class="pd cat ${k===g.col?'on':''}" style="${catVars(k)}" data-act="sgcol" data-id="${g.id}" data-k="${k}" aria-label="${cap(k)}" title="${cap(k)}"></button>`).join('')}</div>`:''}
+  const shut=S.set.sgShut||[];
+  const card=g=>{const ed=sgEdit===g.id,pk=sgPick===g.id,open=ed||!shut.includes(g.id),n=g.splits.map(getSp).filter(Boolean).length;return `<div class="sgcard cat ${ed?'ed':''} ${open?'open':''}" data-sid="${g.id}" data-gid="${g.id}" style="${catVars(g.col)}">
+   <div class="sgh" ${ed?'':`data-act="sgfold" data-id="${g.id}" role="button" tabindex="0" aria-expanded="${open}"`}><span class="sgsw"></span>${ed?`<input class="inp sgni" id="sgn-${g.id}" data-f="sgname" data-id="${g.id}" value="${esc(g.name)}" placeholder="Group name, like Push" maxlength="30" autocomplete="off">`:`<b class="sgn">${esc(g.name||'Group')}</b>${open?'':`<span class="sgct">${n} split${n===1?'':'s'}</span>`}`}<span class="sp"></span>
+    ${ed?`<button class="btn sm pri" data-act="sgdone">${ic('check')}Done</button>`:open?`<button class="btn sm" data-act="sgpick" data-id="${g.id}" aria-expanded="${pk}">${ic('plus')}Add split</button><button class="ib" data-act="sgedit" data-id="${g.id}" aria-label="Edit group" title="Rename or recolour">${ic('edit')}</button><button class="ib qdelb" data-act="sgdel" data-id="${g.id}" aria-label="Delete group" title="Delete">${ic('trash')}</button>`:''}${ed?'':ic('chev')}</div>
+   ${open?`<div class="sgb">${ed?`<div class="gsw">${PKEYS.map(k=>`<button class="pd cat ${k===g.col?'on':''}" style="${catVars(k)}" data-act="sgcol" data-id="${g.id}" data-k="${k}" aria-label="${cap(k)}" title="${cap(k)}"></button>`).join('')}</div>`:''}
    <div class="sgchips" data-sort="sgsplits" data-key="${g.id}" data-whole="1">${g.splits.map(getSp).filter(Boolean).map(sp=>`<span class="sgchip cat" data-sid="${sp.id}" style="${catVars(sp.col)}"><span class="sgsw"></span>${esc(sp.name||'Split')}<button class="gtcx" data-act="sgrm" data-g="${g.id}" data-id="${sp.id}" aria-label="Remove ${esc(sp.name||'split')} from group">${ic('x')}</button></span>`).join('')||`<span class="sgph">Drag splits here, or use Add split</span>`}</div>
-   ${pk?`<div class="sgpick">${S.splits.map(sp=>{const on=g.splits.includes(sp.id);return `<button class="sg cat ${on?'on':''}" style="${catVars(sp.col)}" data-act="sgtog" data-g="${g.id}" data-id="${sp.id}" aria-pressed="${on}"><span class="sw"></span>${esc(sp.name||'Split')}</button>`}).join('')||'<span class="hint">No splits yet.</span>'}</div>`:''}</div>`};
-  return `<div class="sec" style="margin:0 0 12px"><h2>Groups</h2><button class="btn" data-act="sgnew">${ic('plus')}New group</button></div>${G.length?`<div class="sglist" data-sort="sgroups">${G.map(card).join('')}</div>`:''}`}
-document.addEventListener('click',e=>{const t=e.target.closest('[data-act^=sg]');if(!t)return;const a=t.dataset.act;if(!['sgnew','sgedit','sgdone','sgdel','sgpick','sgtog','sgrm','sgcol'].includes(a))return;const g=getSG(t.dataset.g||t.dataset.id);
+   ${pk?`<div class="sgpick">${S.splits.map(sp=>{const on=g.splits.includes(sp.id);return `<button class="sg cat ${on?'on':''}" style="${catVars(sp.col)}" data-act="sgtog" data-g="${g.id}" data-id="${sp.id}" aria-pressed="${on}"><span class="sw"></span>${esc(sp.name||'Split')}</button>`}).join('')||'<span class="hint">No splits yet.</span>'}</div>`:''}</div>`:''}</div>`};
+  return `<div class="sec" style="margin:0 0 14px"><h2>Groups</h2><button class="btn pri" data-act="sgnew">${ic('plus')}New group</button></div>${G.length?`<div class="sglist" data-sort="sgroups" data-whole="1">${G.map(card).join('')}</div>`:''}`}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-act^=sg]');if(!t)return;const a=t.dataset.act;if(!['sgnew','sgedit','sgdone','sgdel','sgpick','sgtog','sgrm','sgcol','sgfold'].includes(a))return;const g=getSG(t.dataset.g||t.dataset.id);
   const focusName=id=>setTimeout(()=>{const f=$('sgn-'+id);if(f){f.focus();f.select()}},30);
   if(a==='sgnew'){pushUndo();const ng={id:uid(),name:'',col:nextCol([...S.sgroups.map(x=>x.col),...S.splits.map(x=>x.col)]),splits:[]};S.sgroups.push(ng);save();sgEdit=ng.id;sgPick=null;renderEx();focusName(ng.id)}
+  else if(a==='sgfold'&&g){const sh=S.set.sgShut||(S.set.sgShut=[]),k=sh.indexOf(g.id);k>=0?sh.splice(k,1):sh.push(g.id);if(k<0&&sgPick===g.id)sgPick=null;save();renderEx()}
   else if(a==='sgedit'&&g){sgEdit=g.id;renderEx();focusName(g.id)}
   else if(a==='sgdone'){const gg=getSG(sgEdit);if(gg&&!gg.name.trim())gg.name='New group';sgEdit=null;save();renderEx();renderGrid()}
   else if(a==='sgdel'&&g){if(!armed(t,ic('check')))return;pushUndo();S.sgroups=S.sgroups.filter(x=>x!==g);save();renderEx();renderGrid();toast('Group deleted')}
@@ -2663,6 +2682,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-act^=sg]')
   else if(a==='sgtog'&&g){pushUndo();const id=t.dataset.id,k=g.splits.indexOf(id);k>=0?g.splits.splice(k,1):g.splits.push(id);save();renderEx();renderGrid()}
   else if(a==='sgrm'&&g){e.stopPropagation();pushUndo();g.splits=g.splits.filter(x=>x!==t.dataset.id);save();renderEx();renderGrid()}
   else if(a==='sgcol'){const gg=getSG(t.dataset.id);if(gg){gg.col=t.dataset.k;save();t.closest('.sgcard').setAttribute('style',catVars(gg.col));t.parentElement.querySelectorAll('.pd').forEach(b=>b.classList.toggle('on',b===t));renderGrid()}}});
+document.addEventListener('keydown',e=>{const t=e.target;if(t.classList&&t.classList.contains('sgh')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();t.click()}});
 document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.f==='sgname'){const g=getSG(t.dataset.id);if(g){g.name=t.value;save()}}});
 document.addEventListener('keydown',e=>{const t=e.target;if(t.dataset&&t.dataset.f==='sgname'&&(e.key==='Enter'||e.key==='Escape')){e.preventDefault();e.stopPropagation();const g=getSG(t.dataset.id);if(g&&!g.name.trim())g.name='New group';sgEdit=null;save();renderEx();renderGrid()}},true);
 function splitsBody(){migSplits();const draft=spEdit&&spEdit.isNew?spEdit.draft:null;
@@ -2670,7 +2690,7 @@ function splitsBody(){migSplits();const draft=spEdit&&spEdit.isNew?spEdit.draft:
   const list=[...S.splits,...(draft?[draft]:[])];
   if(!list.length)return h+`<div class="card empty"><b>Create your first split</b>Pick a muscle group, then add the exercises you do for it.<div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri" data-act="spnewpick">${ic('plus')}New split</button></div></div></div>`;
   const cols=[[],[]];list.forEach(sp=>cols[sp.side===1?1:0].push(sp));
-  return h+`<div class="spboard ${spEdit?'focusing':''}">${cols.map((col,ci)=>`<div class="spcol" data-sort="splitcol" data-key="${ci}">${col.map((sp,ri)=>splitCard(sp).replace('style="',`style="order:${ri*2+ci};`)).join('')}</div>`).join('')}</div></div>`}
+  return h+`<div class="spboard ${spEdit?'focusing':''}">${cols.map((col,ci)=>`<div class="spcol" data-sort="splitcol" data-key="${ci}" data-whole="1">${col.map((sp,ri)=>splitCard(sp).replace('style="',`style="order:${ri*2+ci};`)).join('')}</div>`).join('')}</div></div>`}
 /* board animation: cards keep their column, expanding pushes only what is below */
 function boardRects(){const m={};document.querySelectorAll('#p-ex .spboard [data-sid],#p-ex .spboard [data-sec]').forEach(el=>{m[(el.dataset.sid||'s:'+el.dataset.sec)]=el.getBoundingClientRect()});return m}
 function boardFlip(pre){if(!motionOK())return;const z=ZF();document.querySelectorAll('#p-ex .spboard [data-sid],#p-ex .spboard [data-sec]').forEach(el=>{const a=pre[el.dataset.sid||'s:'+el.dataset.sec];if(!a)return;const b=el.getBoundingClientRect(),dy=(a.top-b.top)/z;if(Math.abs(dy)>1)el.animate([{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'})})}
@@ -2696,8 +2716,8 @@ document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||(srt&&sr
 document.addEventListener('pointerdown',()=>{if(spHovId){clearTimeout(spHovT);spHovId=null;hov.hidden=true}},true);
 function groupRow(g,D){const gd=D.G[g],has=D.groups.includes(g),n=gd.exs.length;let val,unit,top;
   if(g==='Cardio'){const E=S.hist.filter(x=>exInfo(x.exId).group==='Cardio'),bx={};E.forEach(x=>bx[x.exId]=(bx[x.exId]||0)+minutesOf(x));val=Math.round(E.reduce((a,x)=>a+minutesOf(x),0));unit='min';const t=Object.entries(bx).sort((a,b)=>b[1]-a[1])[0];top=t?exInfo(t[0]).name:''}
-  else{val=fmtW(gd.w);unit='sets';top=gd.mus[0]?cap(gd.mus[0][0]):''}
-  const inner=`<span class="cdot cat" style="${catVars(GCOL[g])}"></span><span class="ln"><b>${g}</b><span class="hint">${n} exercise${n===1?'':'s'}</span></span><span class="lv"><b>${gd.dates.length}</b>days</span><span class="lv"><b>${val}</b>${unit}</span><span class="lv mh">${top?`<b style="font-size:17px">${esc(top)}</b>top`:''}</span><span class="lv mh lst">${gd.last?'Last trained '+lastLbl(gd.last):'Not trained yet'}</span>`;
+  else{val=Math.round(gd.w);unit=val===1?'set':'sets';top=gd.mus[0]?cap(gd.mus[0][0]):''}
+  const inner=`<span class="cdot cat" style="${catVars(GCOL[g])}"></span><span class="ln"><b>${g}</b><span class="hint">${n} exercise${n===1?'':'s'}</span></span><span class="lv"><b>${gd.dates.length}</b>${gd.dates.length===1?'day':'days'}</span><span class="lv"><b>${val}</b>${unit}</span><span class="lv mh">${top?`<b style="font-size:17px">${esc(top)}</b>top`:''}</span><span class="lv mh lst">${gd.last?'Last trained '+lastLbl(gd.last):'Not trained yet'}</span>`;
   return has?`<button class="grw" data-act="trtab" data-t="${g}">${inner}${ic('chev')}</button>`:`<div class="grw off">${inner}<span></span></div>`}
 function mainBody(D,ids){return trTab==='overall'?overallBody(D,false):trTab==='week'?weekBody(ids):groupTab(trTab,D,ids)}
 let GB8=false,G2B=null;
@@ -2738,7 +2758,7 @@ function overallBody(D,wk,noList){const H=S.hist;
   if(tot)slices.sort((a,b)=>b.value-a.value);
   const weeks=wk?wkDays().map(w=>{const cnt={};H.filter(h=>h.date===w).forEach(h=>{const c=catOfH(h);if(c)cnt[c]=(cnt[c]||0)+1});return {w,parts:AC.filter(c=>cnt[c]).map(c=>({v:cnt[c],col:GCOL[c],label:c}))}})
     :Array.from({length:8},(_,i)=>{const m=monOf(new Date());m.setDate(m.getDate()-(7-i)*7);const w=ymd(m),cnt={};H.filter(h=>weekOf(h.date)===w).forEach(h=>{const c=catOfH(h);if(c)cnt[c]=(cnt[c]||0)+1});return {w,parts:AC.filter(c=>cnt[c]).map(c=>({v:cnt[c],col:GCOL[c],label:c}))}});
-  const WG=Object.keys(TRACK),srt=WG.map(g=>[g,D.G[g].w]).sort((a,b)=>b[1]-a[1]),tw=srt.reduce((a,x)=>a+x[1],0)||1,topG=srt[0],lowG=srt[srt.length-1];
+  const srt=(AC.length?AC:Object.keys(TRACK)).map(c=>[c,by[c]?by[c].n:0]).sort((a,b)=>b[1]-a[1]),tw=srt.reduce((a,x)=>a+x[1],0)||1,topG=srt[0]||['None',0],lowG=srt[srt.length-1]||['None',0];
   const wsess=new Set(H.map(h=>h.date+'|'+(h.splitId||''))).size,wsets=H.reduce((a,h)=>a+(+h.sets||0),0),wl=wkOff===0?'this week':wkOff===-1?'last week':'that week';
   const tiles=wk?(H.length?[[wsess,'sessions '+wl],[wsets,'sets '+wl],[topG[1]?topG[0]:'None',`most trained${topG[1]?' · '+pct(topG[1]/tw):''}`],[lowG[0],`least trained · ${pct(lowG[1]/tw)}`]]:[[0,'sessions '+wl],[0,'sets '+wl],['Not yet','most trained'],['Not yet','least trained']]):H.length?[[sessThisWeek(),'sessions this week'],[fmtW(sessKeys(28).size/4),'avg sessions a week'],[topG[1]?topG[0]:'None',`most trained group${topG[1]?' · '+pct(topG[1]/tw):''}`],[lowG[0],`least trained group · ${pct(lowG[1]/tw)}`]]:[[0,'sessions this week'],[0,'avg sessions a week'],['Not yet','most trained group'],['Not yet','least trained group']];
   const rows=[...activeCats(),...(D.groups.includes('Custom')?['Custom']:[])];
@@ -2756,7 +2776,7 @@ function cardioBody(D){const gd=D.G.Cardio,E=S.hist.filter(x=>exInfo(x.exId).gro
 function alsoRows(g,exs){const own=new Set(exs),ids=[...new Set([...S.splits.flatMap(sp=>sp.items.map(i=>i.exId)),...S.hist.map(h=>h.exId)].filter(Boolean))].filter(id=>!own.has(id)&&exGroups(id).has(g));
   if(!ids.length)return '';
   return `<div class="alsoh"><span class="lab">Also trained by exercises from other groups</span></div>`+ids.map(id=>{const inf=exInfo(id),parts=(inf.muscles||[]).filter(m=>(m==='triceps all heads'?'Triceps':M2G[m])===g).map(m=>m==='triceps all heads'||m==='triceps'?'All three heads':m==='biceps'?'Both heads':cap(m)),H=S.hist.filter(h=>h.exId===id),w=H.reduce((a,h)=>a+groupW(h,g),0),last=H.map(h=>h.date).sort().pop(),from=catOfEx(id)||inf.group;
-    return `<div class="also"><span class="ln"><b>${esc(inf.name)}</b><span class="hint">from ${esc(from)}</span></span><span class="aparts">${parts.map(p=>`<span class="apart cat" style="${catVars(GCOL[g])}">${esc(p)}</span>`).join('')}</span><span class="lv"><b>${fmtW(w)}</b>sets</span><span class="lv lst">${last?'Last '+lastLbl(last):'Not trained yet'}</span></div>`}).join('')}
+    return `<div class="also"><span class="ln"><b>${esc(inf.name)}</b><span class="hint">from ${esc(from)}</span></span><span class="aparts">${parts.map(p=>`<span class="apart cat" style="${catVars(GCOL[g])}">${esc(p)}</span>`).join('')}</span><span class="lv"><b>${Math.round(w)}</b>${Math.round(w)===1?'set':'sets'}</span><span class="lv lst">${last?'Last '+lastLbl(last):'Not trained yet'}</span></div>`}).join('')}
 function groupBody(g,D){if(g==='Cardio')return cardioBody(D);
   const gd=D.G[g],exs=gd.exs,cmp=exs.some(id=>expEx.has(id)),also=alsoRows(g,exs),list=`<div class="card trlist"><div class="lab">Exercises</div>${exs.length?exs.map(exRow).join(''):(also?'':'<p class="hint" style="padding:8px 0;margin:0">No exercises yet.</p>')}${also}</div>`;
   if(g==='Custom'){const E=S.hist.filter(x=>exInfo(x.exId).group==='Custom'),bx={};E.forEach(x=>bx[x.exId]=(bx[x.exId]||0)+units(x));const tot=E.reduce((a,x)=>a+units(x),0);
@@ -2845,7 +2865,7 @@ function splitCard(sp){
     if(!logDraft.rows.length)h+='<p class="hint">Add exercises to this split first.</p>';
     h+=`<div class="foot"><button class="btn" data-act="lgcancel">Cancel</button><span style="flex:1"></span><button class="btn pri" data-act="lgsave">${ic('check')}Save session</button></div></div>`;return h}
   const open=spOpen.has(sp.id),exl=sp.items.filter(i=>i.exId),when=cnt?dayLabel(last).toLowerCase():'not yet';
-  let h=`<div class="scard cat jc ${open?'open':''}" style="${catVars(sp.col)}" data-sid="${sp.id}"><button class="jch" data-act="sptog" data-id="${sp.id}" aria-expanded="${open}"><span class="grip" data-grip title="Drag to reorder" aria-hidden="true">${ic('grip')}</span><span class="cdot"></span><span class="spt">${nm}</span>${ic('chev')}</button>`;
+  let h=`<div class="scard cat jc ${open?'open':''}" style="${catVars(sp.col)}" data-sid="${sp.id}"><button class="jch" data-act="sptog" data-id="${sp.id}" aria-expanded="${open}"><span class="cdot"></span><span class="spt">${nm}</span>${ic('chev')}</button>`;
   if(open)h+=`<div class="jbody">${exl.length?`<div class="jlist">${exl.map(i=>`<div class="jx"><span>${esc(exInfo(i.exId).name)}</span><span>${specOf(i)}</span></div>`).join('')}</div>`:'<p class="hint" style="margin:0">No exercises yet.</p>'}
    <div class="jfoot"><span class="hint">${cnt} session${cnt===1?'':'s'}${cnt?' · last '+when:''}</span><span class="sp"></span><button class="btn" data-act="spedit" data-id="${sp.id}">${ic('edit')}Edit</button><button class="btn dan" data-act="spdel" data-id="${sp.id}" aria-label="Delete ${nm}" title="Delete">${ic('trash')}</button><button class="btn pri" data-act="splog" data-id="${sp.id}">${ic('check')}Log session</button></div></div>`;
   h+='</div>';
@@ -2977,7 +2997,7 @@ function projHome(){const P=S.projects,AG=allGoals().filter(x=>x.g.status!=='off
      ${p.desc?`<div class="gpdesc">${esc(p.desc)}</div>`:''}${pTags(p)}
      <div class="gcgl">${gs.length?gs.map(g=>`<div class="gcg ${g.status}"><span class="gcgt">${esc(g.title||'Untitled goal')}</span>${g.status==='on'?`<span class="gpb sm"><i style="width:${gProg(g)}%"></i></span><span class="mo">${gProg(g)}%</span>`:gstatPill(g.status)}</div>`).join(''):'<span class="hint">No goals yet</span>'}</div>
      <div class="gnext">${n?`Next: <b>${esc(n.m.t||'Untitled')}</b>${n.m.due?` · ${msStat(n.m)[0].toLowerCase()}`:''}`:`${gs.length} goal${gs.length===1?'':'s'}`}</div></div>`});
-  return h+(pManage?'':`<button class="gc gcnew" data-act="g_new">${ic('plus')}New project</button>`)+'</div>'}
+  return h+'</div>'}
 function projForm(){const ed=gv==='pedit',p=ed?getP(pOpen):null;
   return `<div class="gtopbar"><button class="lk" data-act="${ed&&gFrom==='goal'?'g_back':'g_home'}">${ic('back')}${ed&&gFrom==='goal'?'Back to project':'All projects'}</button></div>
   <div class="card gname"><span class="lab">${ed?'Edit project':'New project'}</span>
@@ -3302,7 +3322,7 @@ function renderProf(){const H=$('p-prof');if(!H)return;const keep=TIPS;TIPS=[];
     ['Calories at rest (BMR)',bmr?fmtK(bmr)+' kcal a day':'Add age, height and weight',bmr?'Standard formula, from age, height, weight and gender':''],
     ['Daily calorie needs',tdee?fmtK(tdee)+' kcal a day':'Needs your BMR first',tdee?`${tdays} workout day${tdays===1?'':'s'} planned ${profOff===0?'this week':'that week'}, ${act[1]}`:''],
     ['Body fat, estimated',bf?fmtW(bf)+'%':age&&age<18?'Not for under 18':'Add gender and age',bf?'From BMI, age and gender':'']];
-  let h1=`<div class="pfh"><div><h1>Profile</h1></div><div class="wnav pfwk"><button class="ib" data-act="pfwk" data-d="-1" aria-label="Previous week">${ic('back')}</button><span><b>${wlab}</b><small>${shortD(wk[0])} to ${shortD(wk[6])}</small></span><button class="ib fwd" data-act="pfwk" data-d="1" aria-label="Next week">${ic('back')}</button></div></div>
+  let h1=`<div class="pfh"><h1>Profile</h1><div class="wkn"><button class="ib" data-act="pfwk" data-d="-1" aria-label="Previous week" title="Previous week">${ic('back')}</button><button class="wkl" data-act="pfwk" data-d="${-profOff}" title="Back to this week"><b>${wlab}</b><span>${shortD(wk[0])} to ${shortD(wk[6])}</span></button><button class="ib fwd" data-act="pfwk" data-d="1" aria-label="Next week" title="Next week">${ic('back')}</button></div></div>
   <div class="pfgrid"><div class="card pfme"><div class="pff"><div class="pfx"><span class="k">Gender</span><div class="seg">${[['m','Male'],['f','Female'],['o','Other']].map(([v,l])=>`<button class="sg ${P.sex===v?'on':''}" data-act="pfsex" data-v="${v}">${l}</button>`).join('')}</div></div>${fld('age','Age','years',10,100,1)}</div>
    <div class="pflog"><div class="lab">Log body</div><div class="pflf">${lfld('w','Weight','kg',.1)}${lfld('h','Height','cm',.5)}<label class="pfx"><span class="k">Date</span><span class="pfv"><input class="pfi" type="date" id="pfl-d" data-f="pfl" data-k="d" value="${pfD.d}" max="${ymd(new Date())}" aria-label="Date"></span></label><button class="btn pri pflb" data-act="pflog">${ic('check')}${S.body.some(e=>e.date===pfD.d)?'Update':'Log'}</button></div><p class="err" id="pfl-err" hidden></p></div>
    <div class="bmi"><div class="bmih"><div><div class="lab">BMI</div><div class="bmiv">${bmi?fmtW(bmi):'<span class="none">None</span>'}</div></div>${bmi?`<span class="pill cat" style="${catVars(BMIC[ci])}">${B.labs[ci]}</span>`:'<span class="hint">Add height and weight</span>'}<span class="sp"></span><div class="seg sm" role="group" aria-label="BMI ranges"><button class="sg ${std==='who'?'on':''}" data-act="pfstd" data-v="who" title="World Health Organization ranges">WHO</button><button class="sg ${std==='asian'?'on':''}" data-act="pfstd" data-v="asian" title="Lower cut offs used for Asian adults, as in Singapore">Asian</button></div></div>${gauge}</div>
@@ -3366,17 +3386,30 @@ const SORTS={
  sgsplits:{apply:(order,key)=>{const g=getSG(key);if(!g)return;if(order.join()===g.splits.join())return;pushUndo();g.splits=order;save();renderEx();renderGrid()}},
  spitems:{a:k=>spEdit&&spEdit.draft.id===k?spEdit.draft.items:null,r:()=>renderEx(),draft:true}};
 let srt=null,sortedAt=0;
-function flipMove(box,fn){const kids=[...box.children],r0=new Map(kids.map(c=>[c,c.getBoundingClientRect()]));fn();if(box.matches('.sgrid'))masonry();
+function flipMove(box,fn){const kids=[...box.children].filter(c=>!c.classList.contains('sorting')),r0=new Map(kids.map(c=>[c,c.getBoundingClientRect()]));fn();if(box.matches('.sgrid'))masonry();
   if(!motionOK())return;const z=ZF();kids.forEach(c=>{const a=r0.get(c),b=c.getBoundingClientRect();const dx=(a.left-b.left)/z,dy=(a.top-b.top)/z;if(!dx&&!dy)return;
   c.style.transition='none';c.style.transform=`translate(${dx}px,${dy}px)`;requestAnimationFrame(()=>{c.style.transition='transform .2s cubic-bezier(.2,.8,.2,1)';c.style.transform='';setTimeout(()=>{c.style.transition=''},220)})})}
-document.addEventListener('pointerdown',e=>{if(e.button!==0)return;const g=e.target.closest('[data-grip]');let it=null;
-  if(g)it=g.closest('[data-sid]');else if(e.pointerType==='mouse'){const w=e.target.closest('[data-sid]');if(w&&w.parentElement&&w.parentElement.dataset.whole)it=w}
+document.addEventListener('pointerdown',e=>{if(e.button!==0||srt)return;const g=e.target.closest('[data-grip]');let it=null;
+  if(g)it=g.closest('[data-sid]');else if(!e.target.closest('input,textarea,select,[contenteditable],button:not(.jch),.sgcard.ed,.scard.editing')){let w=e.target.closest('[data-sid]');while(w&&!(w.parentElement&&w.parentElement.dataset.whole))w=w.parentElement&&w.parentElement.closest('[data-sid]');if(w)it=w}
   if(!it)return;const box=it.parentElement;if(!box||!box.dataset.sort||!SORTS[box.dataset.sort])return;
-  if(g)e.preventDefault();srt={it,box,x0:e.clientX,y0:e.clientY,on:false,id:e.pointerId,lock:null}},true);
+  if(g)e.preventDefault();const r=it.getBoundingClientRect();
+  srt={it,box,x0:e.clientX,y0:e.clientY,ox:e.clientX-r.left,oy:e.clientY-r.top,on:false,id:e.pointerId,lock:null,hold:!g&&e.pointerType!=='mouse'};
+  if(srt.hold){const s1=srt;s1.t=setTimeout(()=>{if(srt===s1){s1.hold=false;s1.ready=true;try{navigator.vibrate&&navigator.vibrate(8)}catch(x){}s1.it.classList.add('srt-ready')}},260)}},true);
+document.addEventListener('touchmove',e=>{if(srt&&(srt.on||srt.ready))e.preventDefault()},{passive:false});
+document.addEventListener('contextmenu',e=>{if(srt&&srt.ready)e.preventDefault()});
+function srtFollow(e){const it=srt.it,z=ZF();it.style.transform='none';const r=it.getBoundingClientRect();
+  it.style.transform=`translate(${(e.clientX-srt.ox-r.left)/z}px,${(e.clientY-srt.oy-r.top)/z}px) scale(1.03)`}
 document.addEventListener('pointermove',e=>{if(!srt||e.pointerId!==srt.id)return;
-  if(!srt.on){if(Math.hypot(e.clientX-srt.x0,e.clientY-srt.y0)<6)return;srt.on=true;srt.it.classList.add('sorting');document.body.classList.add('is-sorting');hideHov&&hideHov();ctip.hidden=true;try{getSelection().removeAllRanges()}catch(x){}}
-  e.preventDefault();const it=srt.it,box=srt.box;
+  if(!srt.on){const d=Math.hypot(e.clientX-srt.x0,e.clientY-srt.y0);if(srt.hold){if(d>8){clearTimeout(srt.t);srt=null}return}if(d<6&&!srt.ready)return;if(d<3)return;srt.on=true;srt.it.classList.remove('srt-ready');srt.it.classList.add('sorting');document.body.classList.add('is-sorting');hideHov&&hideHov();ctip.hidden=true;try{getSelection().removeAllRanges()}catch(x){}}
+  e.preventDefault();const it=srt.it,box=srt.box;requestAnimationFrame(()=>{if(srt&&srt.it===it)srtFollow(e)});
   if(box.dataset.sort==='splitcol'){const el=document.elementFromPoint(e.clientX,e.clientY),gc=el&&el.closest('.sgcard');document.querySelectorAll('.sgcard.over').forEach(x=>x!==gc&&x.classList.remove('over'));if(gc){gc.classList.add('over');srt.grp=gc.dataset.gid;return}if(srt.grp)srt.grp=null;const cols=[...box.parentElement.children].filter(c=>c.classList.contains('spcol'));
+    if(getComputedStyle(box).display==='contents'){const bd=box.parentElement,all=[...bd.querySelectorAll(':scope>.spcol>[data-sid]')],tg=all.find(c=>{if(c===it)return false;const r=c.getBoundingClientRect();return e.clientY>=r.top&&e.clientY<=r.bottom});
+      if(!tg){srt.lock=null;return}if(tg===srt.lock)return;const r=tg.getBoundingClientRect(),ri=it.getBoundingClientRect();it.style.transform='none';const ri0=it.getBoundingClientRect();const after=r.top>ri0.top;
+      if(after?e.clientY<r.top+r.height/2:e.clientY>r.top+r.height/2)return;
+      const z=ZF(),r0=new Map(all.filter(c=>c!==it).map(c=>[c,c.getBoundingClientRect()]));after?tg.after(it):tg.before(it);srt.box=tg.parentElement;
+      cols.forEach((cl,ci)=>[...cl.children].filter(k=>k.dataset.sid).forEach((k,ri)=>{k.style.order=ri*2+ci}));
+      if(motionOK())r0.forEach((a,c)=>{const b2=c.getBoundingClientRect(),dy=(a.top-b2.top)/z;if(Math.abs(dy)>1)c.animate([{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:200,easing:'cubic-bezier(.2,.8,.2,1)'})});
+      srt.lock=tg;return}
     const col=cols.find(c=>{const r=c.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right});
     if(col&&col!==box){const ks=[...col.children].filter(c=>c.dataset.sid),t=ks.find(c=>{const r=c.getBoundingClientRect();return e.clientY<r.top+r.height/2});
       t?t.before(it):col.appendChild(it);srt.box=col;srt.lock=null;return}
@@ -3388,8 +3421,11 @@ document.addEventListener('pointermove',e=>{if(!srt||e.pointerId!==srt.id)return
   const sameRow=Math.min(r.bottom,ri.bottom)-Math.max(r.top,ri.top)>Math.min(r.height,ri.height)*.5;
   const past=sameRow?(after?e.clientX>r.left+r.width/2:e.clientX<r.left+r.width/2):(after?e.clientY>r.top+r.height/2:e.clientY<r.top+r.height/2);
   if(!past)return;flipMove(box,()=>{after?tgt.after(it):tgt.before(it)});srt.lock=tgt},{passive:false});
-function endSort(e){if(!srt||(e&&e.pointerId!==srt.id))return;const s0=srt;srt=null;if(!s0.on)return;
-  s0.it.classList.remove('sorting');document.body.classList.remove('is-sorting');sortedAt=Date.now();
+function endSort(e){if(!srt||(e&&e.pointerId!==srt.id))return;const s0=srt;srt=null;clearTimeout(s0.t);s0.it.classList.remove('srt-ready');if(!s0.on){if(s0.ready)sortedAt=Date.now();return}
+  sortedAt=Date.now();const it=s0.it;
+  const fin=()=>{it.classList.remove('sorting','srt-drop');it.style.transform='';it.style.transition='';document.body.classList.remove('is-sorting');sortedAt=Date.now();endSort2(s0)};
+  if(motionOK()&&!s0.grp){it.classList.add('srt-drop');it.style.transition='transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s';requestAnimationFrame(()=>{it.style.transform='translate(0,0) scale(1)'});setTimeout(fin,210)}else fin()}
+function endSort2(s0){
   const def=SORTS[s0.box.dataset.sort];
   if(s0.grp!==undefined){document.querySelectorAll('.sgcard.over').forEach(x=>x.classList.remove('over'));if(s0.grp){const g=getSG(s0.grp),id=s0.it.dataset.sid;if(g&&!g.splits.includes(id)){pushUndo();g.splits.push(id);save();toast(`Added to ${g.name||'group'}`)}}renderEx();renderGrid();return}
   if(def.apply){def.apply([...s0.box.children].map(c=>c.dataset.sid).filter(Boolean),s0.box.dataset.key);return}
