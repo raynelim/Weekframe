@@ -1730,6 +1730,20 @@ body.gtdragging,body.gtdragging *{cursor:grabbing!important}
 .mysu-c{background:var(--surface);border-radius:14px;padding:22px;max-width:420px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
 .mysu-c b{font-size:17px}.mysu-c p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
 .mysu-f{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+
+.sglist{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:22px}
+.sgcard{border:1px solid var(--line);border-left:4px solid var(--s);border-radius:12px;background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s,background .15s}
+.sgcard.over{box-shadow:0 0 0 2px var(--s);background:color-mix(in srgb,var(--s) 8%,var(--surface))}
+.sgh{display:flex;align-items:center;gap:8px;min-width:0}
+.sgh .sp{flex:1}.sgn{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sgni{flex:1;min-width:0;height:34px}
+.sgsw{width:10px;height:10px;border-radius:3px;background:var(--s);flex:none}
+.sgchips{display:flex;flex-wrap:wrap;gap:6px;min-height:30px;align-items:center}
+.sgchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 4px 0 10px;border-radius:999px;background:color-mix(in srgb,var(--s) 16%,transparent);color:var(--t);font-size:13px;font-weight:500;cursor:grab;user-select:none;touch-action:none}
+.sgph{font-size:13px;color:var(--faint)}
+.sgpick{display:flex;flex-wrap:wrap;gap:6px;padding-top:8px;border-top:1px solid var(--line2)}
+.spcol>[data-sid].sorting{opacity:.55}
+.btag.grp{font-weight:600}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1877,6 +1891,7 @@ function seedExtras(o){
   if(!Array.isArray(o.goals))o.goals=[];
   if(!Array.isArray(o.projects))o.projects=[];
   if(!Array.isArray(o.ptags))o.ptags=[];
+  if(!Array.isArray(o.sgroups))o.sgroups=[];
   if(!o.wlog||typeof o.wlog!=='object')o.wlog={};
   if(!Array.isArray(o.quotes))o.quotes=[];
   if(!o.profile||typeof o.profile!=='object')o.profile={sex:'',age:'',h:'',w:o.set&&+o.set.bw?+o.set.bw:'',std:'who'};
@@ -1908,7 +1923,7 @@ const getC=(id)=>S.cats.find(c=>c.id===id);
 const colOf=(b)=>{const c=getC(b.cat);return c?c.col:'slate'};
 const TRAINRX=/gym|train|workout|exercis|fitness|sport|run|swim|cardio|lift|yoga|pilates|climb|cycl|bike|boxing|martial/i;
 function isTrainB(b){if(bTags(b).length)return true;const c=getC(b.cat);return !!(c&&TRAINRX.test(c.name||''))}
-function wlogSnap(wk){return WB(wk).filter(isTrainB).sort((a,b)=>a.d-b.d||a.s-b.s).map(b=>{const sp=bTags(b).map(getSp).filter(Boolean),c=getC(b.cat);return {d:b.d,s:b.s,e:b.e,title:sp.length?sp.map(x=>x.name||'Split').join(' + '):(b.title||(c?c.name:'Training')),col:sp.length?sp[0].col:colOf(b),splits:sp.map(x=>x.id)}})}
+function wlogSnap(wk){return WB(wk).filter(isTrainB).sort((a,b)=>a.d-b.d||a.s-b.s).flatMap(b=>{const G=bGroups(b);if(G.length){const cov=new Set(G.flatMap(g=>g.splits)),own=bOwn(b).filter(id=>!cov.has(id)).map(getSp);return [...G.map(g=>({d:b.d,s:b.s,e:b.e,title:g.name||'Group',col:g.col,splits:g.splits.filter(id=>getSp(id)),grp:1})),...own.map(sp=>({d:b.d,s:b.s,e:b.e,title:sp.name||'Split',col:sp.col,splits:[sp.id]}))]}return [b]}).map(b=>{if(b.grp||b.title&&b.splits)return b;const sp=bTags(b).map(getSp).filter(Boolean),c=getC(b.cat);return {d:b.d,s:b.s,e:b.e,title:sp.length?sp.map(x=>x.name||'Split').join(' + '):(b.title||(c?c.name:'Training')),col:sp.length?sp[0].col:colOf(b),splits:sp.map(x=>x.id)}})}
 function wlogState(wk){const L=S.wlog&&S.wlog[wk];if(!L)return 'none';return JSON.stringify(L.items)===JSON.stringify(wlogSnap(wk))?'ok':'stale'}
 const order=()=>S.set.weekStart==='sun'?[6,0,1,2,3,4,5]:[0,1,2,3,4,5,6];
 const vdays=()=>order().filter(d=>S.set.days.includes(d));
@@ -1923,7 +1938,7 @@ const hrs=(m)=>{const h=m/60;return (Math.round(h*10)/10).toString().replace(/\.
 const toHM=(m)=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 const fromHM=(v)=>{const p=/^(\d{1,2}):(\d{2})$/.exec(v||'');return p?(+p[1])*60+(+p[2]):null};
 
-const UK=['cats','tts','active','splits','hist','exlib','goals','quotes','profile','body','projects','wlog','ptags'];
+const UK=['cats','tts','active','splits','hist','exlib','goals','quotes','profile','body','projects','wlog','ptags','sgroups'];
 function snap(){const o={};UK.forEach(k=>o[k]=S[k]);return JSON.stringify(o)}
 function pushUndo(){U.push(snap());if(U.length>80)U.shift();R.length=0}
 function restore(str){const o=JSON.parse(str);UK.forEach(k=>S[k]=o[k]);if(sel&&!getB(sel))sel=null;[...msel].forEach(id=>{if(!getB(id))msel.delete(id)})}
@@ -1965,7 +1980,11 @@ function renderChips(){
   const ch=$('chips');ch.dataset.sort='cats';ch.dataset.whole='1';ch.innerHTML=h;
 }
 const exSpec=(i)=>specOf(i);
-const bTags=b=>(Array.isArray(b.tags)?b.tags:(b.split?[b.split]:[])).filter(id=>getSp(id));
+const bOwn=b=>(Array.isArray(b.tags)?b.tags:(b.split?[b.split]:[])).filter(id=>getSp(id));
+const getSG=id=>(S.sgroups||[]).find(g=>g.id===id);
+const bGroups=b=>(Array.isArray(b.groups)?b.groups:[]).map(getSG).filter(Boolean);
+const bTags=b=>{const o=[];bGroups(b).forEach(g=>g.splits.forEach(id=>{if(getSp(id)&&!o.includes(id))o.push(id)}));bOwn(b).forEach(id=>{if(!o.includes(id))o.push(id)});return o};
+const bChips=b=>{const G=bGroups(b),cov=new Set(G.flatMap(g=>g.splits));return [...G.map(g=>({name:g.name||'Group',col:g.col,grp:1})),...bOwn(b).filter(id=>!cov.has(id)).map(id=>{const sp=getSp(id);return {name:sp.name||'Split',col:sp.col}})]};
 function blockExtras(b,ht){let avail=Math.floor((ht-38-(ht>56&&b.loc?16:0)-(bTags(b).length?22:0))/15);if(ht<52||avail<1)return '';let h='';
   if(b.notes&&avail>0)h+=`<div class="bn" style="-webkit-line-clamp:${avail}">${esc(b.notes)}</div>`;return h}
 let seen=null;
@@ -1987,7 +2006,7 @@ function renderGrid(){hideHov();const nowSeen=new Set();
       if(sel===b.id||msel.has(b.id))cls.push('sel');if(b.done)cls.push('done');if(seen&&!seen.has(b.id))cls.push('new');nowSeen.add(b.id);
       const w=100/b._n;
       h+=`<div class="${cls.join(' ')}" data-id="${b.id}" style="${catVars(colOf(b))};top:${t+1}px;height:${ht}px;left:calc(${b._l*w}% + 3px);width:calc(${w}% - 6px)">`
-        +`<div class="bt">${esc(b.title||'Untitled')}</div><div class="bm">${fmt(b.s)}–${fmt(b.e)}</div>${ht>=24&&bTags(b).length?`<div class="btags">${bTags(b).map(id=>{const sp=getSp(id);return `<span class="btag cat" style="${catVars(sp.col)}">${ic('dumbbell')}${esc(sp.name||'Split')}</span>`}).join('')}</div>`:''}${ht>56&&b.loc?`<div class="bl">${esc(b.loc)}</div>`:''}${blockExtras(b,ht)}<div class="rh top"></div><div class="rh"></div></div>`;
+        +`<div class="bt">${esc(b.title||'Untitled')}</div><div class="bm">${fmt(b.s)}–${fmt(b.e)}</div>${ht>=24&&bChips(b).length?`<div class="btags">${bChips(b).map(c=>`<span class="btag cat ${c.grp?'grp':''}" style="${catVars(c.col)}">${ic(c.grp?'layers':'dumbbell')}${esc(c.name)}</span>`).join('')}</div>`:''}${ht>56&&b.loc?`<div class="bl">${esc(b.loc)}</div>`:''}${blockExtras(b,ht)}<div class="rh top"></div><div class="rh"></div></div>`;
     });
     if(d===td&&n>=rs&&n<=re)h+=`<div class="nowl" style="top:${(n-rs)/60*H}px"></div>`;
     h+='</div>';
@@ -2013,7 +2032,8 @@ const B={
   return ['Edit block',`
   <div class="fld"><input class="inp big" id="f-title" placeholder="What is it" value="${esc(b.title)}" autocomplete="off"></div>
   <div class="fld"><span class="lab">Category</span>${catSeg(b.cat)}</div>
-  <div class="fld"><span class="lab">Tags</span>${S.splits.length?(()=>{const tg=bTags(b);return `<div class="seg">${S.splits.map(x=>`<button class="sg cat ${tg.includes(x.id)?'on':''}" style="${catVars(x.col)}" data-act="btag" data-id="${x.id}" aria-pressed="${tg.includes(x.id)}"><span class="sw"></span>${esc(x.name||'Untitled split')}</button>`).join('')}</div>${tg.length?'':''}`+tg.map(id=>{const sp=getSp(id),ex=sp.items.filter(i=>i.exId);return `<div class="splan cat" style="${catVars(sp.col)}"><div class="splan-h">${ic('dumbbell')}<b>${esc(sp.name||'Split')}</b>${wlLogged(b,id)?`<span class="wllg">${ic('check')}Logged ${esc(shortD(bDateOf(b)))}</span>`:`<span>${ex.length} exercise${ex.length===1?'':'s'}</span>`}</div>${ex.length?ex.map(i=>`<div class="splan-r"><span>${esc(exInfo(i.exId).name)}</span><span>${specOf(i)}</span></div>`).join(''):'<p class="hint">This tag has no exercises yet.</p>'}</div>`}).join('')+(tg.length?wlogHTML(b,tg):'')})():`<p class="hint">No tags yet.</p><div><button class="btn" data-act="go" data-p="2" data-tab="splits">${ic('dumbbell')}Go to Training</button></div>`}</div>
+  ${(S.sgroups||[]).length?`<div class="fld"><span class="lab">Group tags</span><div class="seg">${S.sgroups.map(g=>{const on=(b.groups||[]).includes(g.id);return `<button class="sg cat ${on?'on':''}" style="${catVars(g.col)}" data-act="bgrp" data-id="${g.id}" aria-pressed="${on}"><span class="sw"></span>${esc(g.name||'Group')}</button>`}).join('')}</div></div>`:''}
+  <div class="fld"><span class="lab">Tags</span>${S.splits.length?(()=>{const tg=bOwn(b);return `<div class="seg">${S.splits.map(x=>`<button class="sg cat ${tg.includes(x.id)?'on':''}" style="${catVars(x.col)}" data-act="btag" data-id="${x.id}" aria-pressed="${tg.includes(x.id)}"><span class="sw"></span>${esc(x.name||'Untitled split')}</button>`).join('')}</div>`+bTags(b).map(id=>{const sp=getSp(id),ex=sp.items.filter(i=>i.exId);return `<div class="splan cat" style="${catVars(sp.col)}"><div class="splan-h">${ic('dumbbell')}<b>${esc(sp.name||'Split')}</b>${wlLogged(b,id)?`<span class="wllg">${ic('check')}Logged ${esc(shortD(bDateOf(b)))}</span>`:`<span>${ex.length} exercise${ex.length===1?'':'s'}</span>`}</div>${ex.length?ex.map(i=>`<div class="splan-r"><span>${esc(exInfo(i.exId).name)}</span><span>${specOf(i)}</span></div>`).join(''):'<p class="hint">This tag has no exercises yet.</p>'}</div>`}).join('')+(bTags(b).length?wlogHTML(b,bTags(b)):'')})():`<p class="hint">No tags yet.</p><div><button class="btn" data-act="go" data-p="2" data-tab="splits">${ic('dumbbell')}Go to Training</button></div>`}</div>
   <div class="fld"><span class="lab">Day</span><div class="seg">${order().map(d=>`<button class="sg ${b.d===d?'on':''}" data-act="setday" data-d="${d}">${DAYS[d]}</button>`).join('')}</div></div>
   <div class="fld"><span class="lab">Time</span><div class="row"><input class="inp grow" type="time" id="f-s" step="300" value="${toHM(b.s)}"><span class="hint">to</span><input class="inp grow" type="time" id="f-e" step="300" value="${toHM(b.e%1440)}"></div>
    <p class="err" id="t-err" hidden></p>
@@ -2090,7 +2110,7 @@ function mySetupApply(){const old=S.splits.slice(),byName={};old.forEach(x=>byNa
   const ns=MYPLAN.map(([nm,cat,rows],k)=>{const o=byName[nm.toLowerCase()];const FIX={Quads:'green',Hamstrings:'teal',Glutes:'olive',Calves:'mint',Core:'sky'};const col=o?o.col:FIX[nm]||(GCOL[cat]&&!used.includes(GCOL[cat])?GCOL[cat]:nextCol(used));used.push(col);
     const sp={id:o?o.id:uid(),side:k%2,name:nm,cat,col,items:rows.map(([n,sets,reps,rx,w,wx,t])=>{const id=exSlug(n);const it={id:uid(),exId:id,sets,reps:reps===''?'':reps,w:w===''?'':+w};if(rx)it.rx=rx;if(wx)it.wx=wx;if(t!=='')it.t=t;return it})};return sp});
   const keep=new Set(ns.map(x=>x.id));old.forEach(x=>{const m=ns.find(y=>y.name.toLowerCase()===(x.name||'').toLowerCase());idMap[x.id]=m?m.id:null});
-  pushUndo();S.splits=ns;S.tts.forEach(tt=>(tt.blocks||[]).forEach(b=>{const tg=bTags(b).map(id=>keep.has(id)?id:idMap[id]).filter(Boolean);b.tags=[...new Set(tg)];delete b.split}));
+  pushUndo();S.splits=ns;S.tts.forEach(tt=>(tt.blocks||[]).forEach(b=>{const tg=bOwn(b).map(id=>keep.has(id)?id:idMap[id]).filter(Boolean);b.tags=[...new Set(tg)].filter(id=>!bGroups(b).some(g=>g.splits.includes(id)));delete b.split}));
   if(typeof syncCatCols==='function')syncCatCols();save();renderAll();renderEx();toast('Your tags are set up')}
 function mySetupCheck(){if(location.hash!=='#mysetup')return;history.replaceState(null,'',location.pathname+location.search);const d=document.createElement('div');d.className='mysu';
   d.innerHTML=`<div class="mysu-c" role="dialog" aria-label="Set up tags"><b>Set up your tags?</b><p>This replaces the tags on this device with ${MYPLAN.length} muscle group tags and their exercises. Week blocks keep tags with matching names.</p><div class="mysu-f"><button class="btn" data-mysu="no">Cancel</button><button class="btn pri" data-mysu="yes">Replace tags</button></div></div>`;
@@ -2218,7 +2238,7 @@ function drawExport(){
     x.fillStyle=p[1];x.font=`500 12px ${F}`;x.fillText(clip(b.title||'Untitled',w-16),X+8,Y+16);
     if(h>34){x.fillStyle=p[2];x.font=`400 10.5px ${M}`;x.fillText(clip(`${fmt(b.s)}–${fmt(b.e)}`,w-16),X+8,Y+31)}
     let cy=Y+46;x.font=`400 11px ${F}`;if(h>52&&b.loc){x.fillText(clip(b.loc,w-16),X+8,cy);cy+=15}
-    if(cy<=Y+h-5&&bTags(b).length){let tx=X+7;bTags(b).forEach(id=>{const sp=getSp(id),sc=(PAL[sp.col]||PAL.slate)[0];x.font=`500 10.5px ${F}`;const tw=Math.min(x.measureText(sp.name||'Split').width+14,X+w-9-tx);if(tw<20)return;x.fillStyle=sc[2];x.globalAlpha=.18;x.beginPath();x.roundRect(tx,cy-11,tw,16,8);x.fill();x.globalAlpha=1;x.fillStyle=sc[1];x.fillText(clip(sp.name||'Split',tw-14),tx+7,cy);tx+=tw+4});cy+=19}
+    if(cy<=Y+h-5&&bChips(b).length){let tx=X+7;bChips(b).forEach(sp=>{const sc=(PAL[sp.col]||PAL.slate)[0];x.font=`500 10.5px ${F}`;const tw=Math.min(x.measureText(sp.name||'Split').width+14,X+w-9-tx);if(tw<20)return;x.fillStyle=sc[2];x.globalAlpha=.18;x.beginPath();x.roundRect(tx,cy-11,tw,16,8);x.fill();x.globalAlpha=1;x.fillStyle=sc[1];x.fillText(clip(sp.name||'Split',tw-14),tx+7,cy);tx+=tw+4});cy+=19}
     if(b.notes&&cy<=Y+h-5){x.font=`400 11px ${F}`;x.globalAlpha=.8;x.fillStyle=p[1];x.fillText(clip(b.notes.replace(/\s+/g,' '),w-16),X+8,cy);x.globalAlpha=1}
     x.restore()})});
   return cv;
@@ -2388,8 +2408,9 @@ document.addEventListener('change',e=>{if(mode!=='multi')return;const t=e.target
     if(en<=s){er.textContent='End time has to be after the start time.';er.hidden=false;return}
     er.hidden=true;editM(b=>{b.s=s;b.e=en});refreshDrawer()}});
 
+document.addEventListener('click',e=>{const t=e.target.closest('[data-act=bgrp]');if(!t)return;const id=t.dataset.id;editB(b=>{const g=Array.isArray(b.groups)?b.groups.slice():[],k=g.indexOf(id);k>=0?g.splice(k,1):g.push(id);b.groups=g;const sg=getSG(id);if(k<0&&!b.title&&sg)b.title=sg.name});refreshDrawer()});
 document.addEventListener('click',e=>{const t=e.target.closest('[data-act=btag],[data-act=mbtag]');if(!t)return;const id=t.dataset.id;
-  if(t.dataset.act==='btag'){editB(b=>{const tg=bTags(b).slice(),k=tg.indexOf(id);k>=0?tg.splice(k,1):tg.push(id);b.tags=tg;delete b.split;const sp=getSp(id);if(k<0&&!b.title&&sp)b.title=sp.name});refreshDrawer()}
+  if(t.dataset.act==='btag'){editB(b=>{const tg=bOwn(b).slice(),k=tg.indexOf(id);k>=0?tg.splice(k,1):tg.push(id);b.tags=tg;delete b.split;const sp=getSp(id);if(k<0&&!b.title&&sp)b.title=sp.name});refreshDrawer()}
   else{const M=[...msel].map(getB).filter(Boolean),all=M.every(b=>bTags(b).includes(id));editM(b=>{let tg=bTags(b).filter(x=>x!==id);if(!all)tg.push(id);b.tags=tg;delete b.split});refreshDrawer()}});
 document.addEventListener('click',e=>{const t=e.target.closest('[data-act=vwk],[data-act=copywk]');if(!t)return;
   if(t.dataset.act==='vwk'){const d=+t.dataset.d;viewWk=d===0?curWk():wkShift(viewWk,d);sel=null;msel.clear();if(mode==='block'||mode==='multi')closeDrawer();seen=null;renderAll();refreshDrawer()}
@@ -2623,8 +2644,29 @@ function spDetail(sp){const ex=sp.items.filter(i=>i.exId),st=spStats(sp),sets=ex
    <div class="hv-m">${ex.length} exercise${ex.length===1?'':'s'}${sets?` · ${sets} sets`:''}</div>
    <div class="hv-sp cat" style="${catVars(sp.col)}">${ex.length?ex.map(i=>`<div class="hv-ex"><span>${esc(exInfo(i.exId).name)}</span><span>${specOf(i)}</span></div>`).join(''):'<div class="hint">No exercises yet</div>'}</div>
    <div class="hv-r">${ic('check')}<span>${st.cnt?`Last done <b>${dayLabel(st.last).toLowerCase()}</b> · ${st.cnt} session${st.cnt===1?'':'s'}`:'Not logged yet'}</span></div>`}
+let sgEdit=null,sgPick=null;
+function sgSection(){const G=S.sgroups||[];
+  const card=g=>{const ed=sgEdit===g.id,pk=sgPick===g.id;return `<div class="sgcard cat ${ed?'ed':''}" data-sid="${g.id}" data-gid="${g.id}" style="${catVars(g.col)}">
+   <div class="sgh"><span class="grip" data-grip title="Drag to reorder" aria-hidden="true">${ic('grip')}</span><span class="sgsw"></span>${ed?`<input class="inp sgni" id="sgn-${g.id}" data-f="sgname" data-id="${g.id}" value="${esc(g.name)}" placeholder="Group name, like Push" maxlength="30" autocomplete="off">`:`<b class="sgn">${esc(g.name||'Group')}</b>`}<span class="sp"></span>
+    ${ed?`<button class="btn sm pri" data-act="sgdone">${ic('check')}Done</button>`:`<button class="btn sm" data-act="sgpick" data-id="${g.id}" aria-expanded="${pk}">${ic('plus')}Add split</button><button class="ib" data-act="sgedit" data-id="${g.id}" aria-label="Edit group" title="Rename or recolour">${ic('edit')}</button><button class="ib qdelb" data-act="sgdel" data-id="${g.id}" aria-label="Delete group" title="Delete">${ic('trash')}</button>`}</div>
+   ${ed?`<div class="gsw">${PKEYS.map(k=>`<button class="pd cat ${k===g.col?'on':''}" style="${catVars(k)}" data-act="sgcol" data-id="${g.id}" data-k="${k}" aria-label="${cap(k)}" title="${cap(k)}"></button>`).join('')}</div>`:''}
+   <div class="sgchips" data-sort="sgsplits" data-key="${g.id}" data-whole="1">${g.splits.map(getSp).filter(Boolean).map(sp=>`<span class="sgchip cat" data-sid="${sp.id}" style="${catVars(sp.col)}"><span class="sgsw"></span>${esc(sp.name||'Split')}<button class="gtcx" data-act="sgrm" data-g="${g.id}" data-id="${sp.id}" aria-label="Remove ${esc(sp.name||'split')} from group">${ic('x')}</button></span>`).join('')||`<span class="sgph">Drag splits here, or use Add split</span>`}</div>
+   ${pk?`<div class="sgpick">${S.splits.map(sp=>{const on=g.splits.includes(sp.id);return `<button class="sg cat ${on?'on':''}" style="${catVars(sp.col)}" data-act="sgtog" data-g="${g.id}" data-id="${sp.id}" aria-pressed="${on}"><span class="sw"></span>${esc(sp.name||'Split')}</button>`}).join('')||'<span class="hint">No splits yet.</span>'}</div>`:''}</div>`};
+  return `<div class="sec" style="margin:0 0 12px"><h2>Groups</h2><button class="btn" data-act="sgnew">${ic('plus')}New group</button></div>${G.length?`<div class="sglist" data-sort="sgroups">${G.map(card).join('')}</div>`:''}`}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-act^=sg]');if(!t)return;const a=t.dataset.act;if(!['sgnew','sgedit','sgdone','sgdel','sgpick','sgtog','sgrm','sgcol'].includes(a))return;const g=getSG(t.dataset.g||t.dataset.id);
+  const focusName=id=>setTimeout(()=>{const f=$('sgn-'+id);if(f){f.focus();f.select()}},30);
+  if(a==='sgnew'){pushUndo();const ng={id:uid(),name:'',col:nextCol([...S.sgroups.map(x=>x.col),...S.splits.map(x=>x.col)]),splits:[]};S.sgroups.push(ng);save();sgEdit=ng.id;sgPick=null;renderEx();focusName(ng.id)}
+  else if(a==='sgedit'&&g){sgEdit=g.id;renderEx();focusName(g.id)}
+  else if(a==='sgdone'){const gg=getSG(sgEdit);if(gg&&!gg.name.trim())gg.name='New group';sgEdit=null;save();renderEx();renderGrid()}
+  else if(a==='sgdel'&&g){if(!armed(t,ic('check')))return;pushUndo();S.sgroups=S.sgroups.filter(x=>x!==g);save();renderEx();renderGrid();toast('Group deleted')}
+  else if(a==='sgpick'&&g){sgPick=sgPick===g.id?null:g.id;renderEx()}
+  else if(a==='sgtog'&&g){pushUndo();const id=t.dataset.id,k=g.splits.indexOf(id);k>=0?g.splits.splice(k,1):g.splits.push(id);save();renderEx();renderGrid()}
+  else if(a==='sgrm'&&g){e.stopPropagation();pushUndo();g.splits=g.splits.filter(x=>x!==t.dataset.id);save();renderEx();renderGrid()}
+  else if(a==='sgcol'){const gg=getSG(t.dataset.id);if(gg){gg.col=t.dataset.k;save();t.closest('.sgcard').setAttribute('style',catVars(gg.col));t.parentElement.querySelectorAll('.pd').forEach(b=>b.classList.toggle('on',b===t));renderGrid()}}});
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.f==='sgname'){const g=getSG(t.dataset.id);if(g){g.name=t.value;save()}}});
+document.addEventListener('keydown',e=>{const t=e.target;if(t.dataset&&t.dataset.f==='sgname'&&(e.key==='Enter'||e.key==='Escape')){e.preventDefault();e.stopPropagation();const g=getSG(t.dataset.id);if(g&&!g.name.trim())g.name='New group';sgEdit=null;save();renderEx();renderGrid()}},true);
 function splitsBody(){migSplits();const draft=spEdit&&spEdit.isNew?spEdit.draft:null;
-  let h=`<div class="trsc"><div class="sec" style="margin:0 0 14px"><h2>Your splits</h2><button class="btn pri" data-act="spnewpick">${ic('plus')}New split</button></div>`;
+  let h=`<div class="trsc">${sgSection()}<div class="sec" style="margin:0 0 14px"><h2>Your splits</h2><button class="btn pri" data-act="spnewpick">${ic('plus')}New split</button></div>`;
   const list=[...S.splits,...(draft?[draft]:[])];
   if(!list.length)return h+`<div class="card empty"><b>Create your first split</b>Pick a muscle group, then add the exercises you do for it.<div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri" data-act="spnewpick">${ic('plus')}New split</button></div></div></div>`;
   const cols=[[],[]];list.forEach(sp=>cols[sp.side===1?1:0].push(sp));
@@ -3320,6 +3362,8 @@ const SORTS={
  splits:{a:()=>S.splits,r:()=>renderEx()},
  splitcol:{a:()=>S.splits,r:()=>renderEx(),board:true},
  tabs:{apply:order=>{S.set.tabOrder=order;save();renderEx()}},
+ sgroups:{a:()=>S.sgroups,r:()=>renderEx()},
+ sgsplits:{apply:(order,key)=>{const g=getSG(key);if(!g)return;if(order.join()===g.splits.join())return;pushUndo();g.splits=order;save();renderEx();renderGrid()}},
  spitems:{a:k=>spEdit&&spEdit.draft.id===k?spEdit.draft.items:null,r:()=>renderEx(),draft:true}};
 let srt=null,sortedAt=0;
 function flipMove(box,fn){const kids=[...box.children],r0=new Map(kids.map(c=>[c,c.getBoundingClientRect()]));fn();if(box.matches('.sgrid'))masonry();
@@ -3332,7 +3376,7 @@ document.addEventListener('pointerdown',e=>{if(e.button!==0)return;const g=e.tar
 document.addEventListener('pointermove',e=>{if(!srt||e.pointerId!==srt.id)return;
   if(!srt.on){if(Math.hypot(e.clientX-srt.x0,e.clientY-srt.y0)<6)return;srt.on=true;srt.it.classList.add('sorting');document.body.classList.add('is-sorting');hideHov&&hideHov();ctip.hidden=true;try{getSelection().removeAllRanges()}catch(x){}}
   e.preventDefault();const it=srt.it,box=srt.box;
-  if(box.dataset.sort==='splitcol'){const cols=[...box.parentElement.children].filter(c=>c.classList.contains('spcol'));
+  if(box.dataset.sort==='splitcol'){const el=document.elementFromPoint(e.clientX,e.clientY),gc=el&&el.closest('.sgcard');document.querySelectorAll('.sgcard.over').forEach(x=>x!==gc&&x.classList.remove('over'));if(gc){gc.classList.add('over');srt.grp=gc.dataset.gid;return}if(srt.grp)srt.grp=null;const cols=[...box.parentElement.children].filter(c=>c.classList.contains('spcol'));
     const col=cols.find(c=>{const r=c.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right});
     if(col&&col!==box){const ks=[...col.children].filter(c=>c.dataset.sid),t=ks.find(c=>{const r=c.getBoundingClientRect();return e.clientY<r.top+r.height/2});
       t?t.before(it):col.appendChild(it);srt.box=col;srt.lock=null;return}
@@ -3347,7 +3391,8 @@ document.addEventListener('pointermove',e=>{if(!srt||e.pointerId!==srt.id)return
 function endSort(e){if(!srt||(e&&e.pointerId!==srt.id))return;const s0=srt;srt=null;if(!s0.on)return;
   s0.it.classList.remove('sorting');document.body.classList.remove('is-sorting');sortedAt=Date.now();
   const def=SORTS[s0.box.dataset.sort];
-  if(def.apply){def.apply([...s0.box.children].map(c=>c.dataset.sid).filter(Boolean));return}
+  if(s0.grp!==undefined){document.querySelectorAll('.sgcard.over').forEach(x=>x.classList.remove('over'));if(s0.grp){const g=getSG(s0.grp),id=s0.it.dataset.sid;if(g&&!g.splits.includes(id)){pushUndo();g.splits.push(id);save();toast(`Added to ${g.name||'group'}`)}}renderEx();renderGrid();return}
+  if(def.apply){def.apply([...s0.box.children].map(c=>c.dataset.sid).filter(Boolean),s0.box.dataset.key);return}
   const arr=def.a(s0.box.dataset.key);if(!arr)return;
   let order=[...s0.box.children].map(c=>c.dataset.sid).filter(Boolean);
   if(def.board){const cols=[...s0.box.parentElement.children].filter(c=>c.classList.contains('spcol'));order=[];let moved=false;
@@ -3418,7 +3463,7 @@ function renderCal(){const P=$('p-cal');if(!P)return;const today=ymd(new Date())
   const start=monOf(calM),days=[];for(let i=0;i<42;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d)}
   const byDate={};S.hist.forEach(h=>{(byDate[h.date]=byDate[h.date]||[]).push(h)});
   const exOf=ds=>{const d=ymdP(ds),dow=(d.getDay()+6)%7,L=S.wlog&&S.wlog[weekOf(ds)],hs=byDate[ds]||[],done=new Set(hs.map(h=>h.splitId||'')),out=[],seen=new Set();
-    (L?L.items:[]).filter(x=>x.d===dow).flatMap(x=>x.splits.length?x.splits.map(id=>{const sp=getSp(id);return {...x,title:sp?sp.name||'Split':x.title,col:sp?sp.col:x.col,splits:[id]}}):[x]).forEach(x=>{const k=x.title+'|'+x.s;if(seen.has(k))return;seen.add(k);out.push({...x,lg:x.splits.some(id=>done.has(id))})});
+    (L?L.items:[]).filter(x=>x.d===dow).flatMap(x=>x.splits.length&&!x.grp?x.splits.map(id=>{const sp=getSp(id);return {...x,title:sp?sp.name||'Split':x.title,col:sp?sp.col:x.col,splits:[id]}}):[x]).forEach(x=>{const k=x.title+'|'+x.s;if(seen.has(k))return;seen.add(k);out.push({...x,lg:x.splits.some(id=>done.has(id))})});
     [...done].forEach(id=>{if(out.some(x=>x.splits.includes(id)))return;const sp=getSp(id);out.push({title:sp?sp.name||'Split':'Training',col:sp?sp.col:'slate',splits:[id],lg:true,s:-1})});return out};
   migrateGoals();const gBy={},push=(d,x)=>(gBy[d]=gBy[d]||[]).push(x),AG=allGoals().filter(x=>x.g.status!=='off');AG.forEach(({p,g})=>{if(g.due)push(g.due,{_gd:1,p,g,col:p.col,title:pName(p)+' - '+(g.title||'goal')});g.ms.forEach(m=>{if(m.due)push(m.due,{_ms:1,p,g,m,col:p.col,title:m.t||'Milestone'})})});
   days.forEach(d=>{const ds=ymd(d);AG.forEach(({p,g})=>{if(checkinsIn(g,ds))push(ds,{_ci:1,p,g,col:p.col,title:'Check in: '+(g.title||'goal')})})});
@@ -3439,7 +3484,7 @@ function dayDetail(ds,hs,gs,ex){ex=ex||[];const d=ymdP(ds),dow=(d.getDay()+6)%7,
    <div class="ostat4 c2">${[[sess||0,'sessions'],[hs.length,'exercises'],[sets,'sets'],[sch?hrs(sch):'None','scheduled']].map(tileHTML).join('')}</div>`;
   h+=`<div class="csec"><span class="lab">Training</span>`;
   {const by={};hs.forEach(x=>{const k=x.splitId||'';(by[k]=by[k]||[]).push(x)});const cards=[],used=new Set();
-   ex.forEach(x=>{const id=x.splits[0];if(id){if(used.has(id))return;used.add(id);const sp=getSp(id),L=by[id];cards.push({title:sp?sp.name||'Split':x.title,col:sp?sp.col:x.col,lg:!!L,time:x.s>=0?`${fmt(x.s)} to ${fmt(x.e)}`:'',rows:L?L.map(r=>[exInfo(r.exId).name,specOf(r)]):(sp?sp.items.filter(i=>i.exId).map(i=>[exInfo(i.exId).name,specOf(i)]):[])})}else cards.push({title:x.title,col:x.col,lg:false,time:x.s>=0?`${fmt(x.s)} to ${fmt(x.e)}`:'',rows:[]})});
+   ex.flatMap(x=>x.splits.length?x.splits.map(id=>({...x,splits:[id]})):[x]).forEach(x=>{const id=x.splits[0];if(id){if(used.has(id))return;used.add(id);const sp=getSp(id),L=by[id];cards.push({title:sp?sp.name||'Split':x.title,col:sp?sp.col:x.col,lg:!!L,time:x.s>=0?`${fmt(x.s)} to ${fmt(x.e)}`:'',rows:L?L.map(r=>[exInfo(r.exId).name,specOf(r)]):(sp?sp.items.filter(i=>i.exId).map(i=>[exInfo(i.exId).name,specOf(i)]):[])})}else cards.push({title:x.title,col:x.col,lg:false,time:x.s>=0?`${fmt(x.s)} to ${fmt(x.e)}`:'',rows:[]})});
    Object.entries(by).forEach(([k,L])=>{if(used.has(k))return;const sp=getSp(k);cards.push({title:sp?sp.name||'Split':'No split',col:sp?sp.col:'slate',lg:true,time:'',rows:L.map(r=>[exInfo(r.exId).name,specOf(r)])})});
    if(cards.length){h+=cards.map(c=>`<div class="ctr"><div class="ctrh cat" style="${catVars(c.col)}"><i class="ccd ${c.lg?'on':''}"></i><b>${esc(c.title)}</b><span class="hint">${c.time||(c.rows.length?c.rows.length+' exercise'+(c.rows.length===1?'':'s'):'')}</span></div>${c.rows.map(r=>`<div class="ctrr"><span>${esc(r[0])}</span><span>${r[1]}</span></div>`).join('')}</div>`).join('');if(kc)h+=`<p class="hint">About ${Math.round(kc)} kcal burned on cardio, estimated.</p>`}
    else h+=`<p class="hint">${ds>ymd(new Date())?'Nothing planned yet.':'No training this day.'}</p>`}
